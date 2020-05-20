@@ -1,3 +1,4 @@
+#include "block_buf_reader.h"
 #include "avx2/simd.h"
 
 
@@ -33,6 +34,10 @@ namespace range {
 #include "generic/utf8_range_algorithm.h"
 }
 
+
+namespace basic {
+#include "generic/utf8_fastvalidate_algorithm.h"
+}
 
 }
 }

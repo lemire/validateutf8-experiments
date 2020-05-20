@@ -173,6 +173,9 @@ struct utf8_checker {
   }
 
   really_inline error_code errors() {
-    return this->has_error.any_bits_set_anywhere() ? UTF8_ERROR : SUCCESS;
+    return this->has_error.any_bits_set_anywhere() ? error_code::UTF8_ERROR : error_code::SUCCESS;
   }
 }; // struct utf8_checker
+
+
+#include "validator.h"

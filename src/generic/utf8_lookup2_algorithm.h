@@ -419,3 +419,7 @@ using namespace simd;
     }
 
   }; // struct utf8_checker
+
+
+
+#include "validator.h"

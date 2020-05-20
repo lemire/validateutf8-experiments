@@ -293,3 +293,7 @@ struct utf8_checker {
   }
 
 }; // struct utf8_checker
+
+
+
+#include "validator.h"

@@ -338,10 +338,6 @@ struct utf8_checker {
   really_inline void check_next_input(simd8<uint8_t> bytes) {
     vmask_t bit_7 = bytes.get_bit<7>();
     if (unlikely(bit_7)) {
-      // TODO (@jkeiser): To work with simdjson's caller model, I moved the calculation of
-      // shifted_bytes inside check_utf8_bytes. I believe this adds an extra instruction to the hot
-      // path (saving prev_bytes), which is undesirable, though 2 register accesses vs. 1 memory
-      // access might be a wash. Come back and try the other way.
       this->check_utf8_bytes(bytes, bit_7);
     } else {
       this->length_errors |= this->last_cont;
@@ -358,3 +354,6 @@ struct utf8_checker {
     return (this->special_case_errors.any_bits_set_anywhere() | this->length_errors) ? error_code::UTF8_ERROR : error_code::SUCCESS;
   }
 }; // struct utf8_checker
+
+#include "validator.h"
+

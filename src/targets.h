@@ -6,8 +6,9 @@
 #ifndef unlikely
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
-
+namespace fastvalidate {
 enum class error_code { SUCCESS, UTF8_ERROR };
+}
 // this is almost standard?
 #undef STRINGIFY_IMPLEMENTATION_
 #undef STRINGIFY

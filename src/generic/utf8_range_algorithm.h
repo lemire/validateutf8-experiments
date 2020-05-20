@@ -178,3 +178,7 @@ struct utf8_checker {
     return this->has_error.any() ? error_code::UTF8_ERROR : error_code::SUCCESS;
   }
 }; // struct utf8_checker
+
+
+
+#include "validator.h"
