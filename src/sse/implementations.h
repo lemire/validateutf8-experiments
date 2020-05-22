@@ -5,9 +5,6 @@
 TARGET_WESTMERE
 namespace fastvalidate {
 namespace westmere {
-namespace lookup {
-#include "generic/utf8_lookup_algorithm.h"
-}
 namespace lookup2 {
 using namespace simd;
 really_inline bool is_ascii(simd8x64<uint8_t> input) {

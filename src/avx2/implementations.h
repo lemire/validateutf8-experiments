@@ -5,9 +5,6 @@
 TARGET_HASWELL
 namespace fastvalidate {
 namespace haswell {
-namespace lookup {
-#include "generic/utf8_lookup_algorithm.h"
-}
 
 namespace lookup2 {
 using namespace simd;
