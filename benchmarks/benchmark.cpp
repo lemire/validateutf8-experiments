@@ -16,11 +16,12 @@
     }                                                                          \
     double freq = (all.best.cycles() / all.best.elapsed_sec()) / 1000000000.0; \
     double insperunit = all.best.instructions() / double(volume);              \
+    double branchmissperunit = all.best.branch_misses() / double(volume);              \
     double gbs = double(volume) / all.best.elapsed_ns();                       \
     if (collector.has_events()) {                                              \
-      printf("                               %8.3f ins/byte, %8.3f GHz, "      \
+      printf("                               %8.3f ins/byte, %8.3f %% branch miss/byte,   %8.3f GHz, "      \
              "%8.3f GB/s \n",                                                  \
-             insperunit, freq, gbs);                                           \
+             insperunit, branchmissperunit * 100 ,freq, gbs);                                           \
     } else {                                                                   \
       printf("                               %8.3f GB/s \n", gbs);             \
     }                                                                          \
@@ -96,10 +97,10 @@ public:
       return fastvalidate::westmere::basic::validate(UTF8.data(), s);
     };
 
-    RUN("lookup2sse", lookup2sse);
-    RUN("rangesse", rangesse);
-    RUN("zwegnersse", zwegnersse);
-    RUN("basicsse", basicsse);
+    //RUN("lookup2sse", lookup2sse);
+    //RUN("rangesse", rangesse);
+    //RUN("zwegnersse", zwegnersse);
+    //RUN("basicsse", basicsse);
 
     auto lookup2avx = [&UTF8, &s]() {
       return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
@@ -115,9 +116,9 @@ public:
     };
 
     RUN("lookup2avx", lookup2avx);
-    RUN("rangeavx", rangeavx);
-    RUN("zwegneravx", zwegneravx);
-    RUN("basicavx", basicavx);
+    //RUN("rangeavx", rangeavx);
+    //RUN("zwegneravx", zwegneravx);
+    //RUN("basicavx", basicavx);
 
   }
 };
