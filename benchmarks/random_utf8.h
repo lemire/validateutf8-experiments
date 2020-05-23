@@ -14,7 +14,9 @@ public:
 
     std::vector<uint8_t> generate(size_t output_bytes);
     std::vector<uint8_t> generate(size_t output_bytes, long seed);
+
 private:
+
     uint32_t generate();
 
     std::mt19937 gen;

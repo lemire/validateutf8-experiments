@@ -42,19 +42,18 @@ public:
     printf("\n");
     printf("Running UTF8 => UTF16 benchmark.\n");
     printf("The speed is normalized by the number of input bytes.\n");
-    const size_t repeat = 10000;
+    const size_t repeat = 10;
     RandomUTF8 gen_1byte(rd, 1, 0, 0, 0);
     RandomUTF8 gen_2bytes(rd, 0, 1, 0, 0);
     RandomUTF8 gen_1_2(rd, 1, 1, 0, 0);
     RandomUTF8 gen_1_2_3(rd, 1, 1, 1, 0);
     RandomUTF8 gen_1_2_3_4(rd, 1, 1, 1, 1);
+    RandomUTF8 gen_3bytes(rd, 0, 0, 1, 0);
+    RandomUTF8 gen_4bytes(rd, 0, 0, 0, 1);
     printf("Input size: (UTF8) %lu\n", size);
 
     puts("- ASCII characters");
     run(gen_1byte, repeat);
-
-    puts("- Exactly 2 UTF8 bytes");
-    run(gen_2bytes, repeat);
 
     puts("- 1 or 2 UTF8 bytes");
     run(gen_1_2, repeat);
@@ -72,7 +71,6 @@ public:
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);
-
     auto fushia = [&UTF8, &s]() {
       return fidl_validate_string(UTF8.data(), s);
     };
@@ -83,49 +81,18 @@ public:
       return shiftless_validate_dfa_utf8((const char*) UTF8.data(), s);
     };
     RUN("dfa", dfa);
-
-    auto lookup2sse = [&UTF8, &s]() {
-      return fastvalidate::westmere::lookup2::validate(UTF8.data(), s);
-    };
-    auto rangesse = [&UTF8, &s]() {
-      return fastvalidate::westmere::range::validate(UTF8.data(), s);
-    };
-    auto zwegnersse = [&UTF8, &s]() {
-      return fastvalidate::westmere::zwegner::validate(UTF8.data(), s);
-    };
-    auto basicsse = [&UTF8, &s]() {
-      return fastvalidate::westmere::basic::validate(UTF8.data(), s);
-    };
-
-    //RUN("lookup2sse", lookup2sse);
-    //RUN("rangesse", rangesse);
-    //RUN("zwegnersse", zwegnersse);
-    //RUN("basicsse", basicsse);
-
     auto lookup2avx = [&UTF8, &s]() {
       return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
     };
-    auto rangeavx = [&UTF8, &s]() {
-      return fastvalidate::haswell::range::validate(UTF8.data(), s);
-    };
-    auto zwegneravx = [&UTF8, &s]() {
-      return fastvalidate::haswell::zwegner::validate(UTF8.data(), s);
-    };
-    auto basicavx = [&UTF8, &s]() {
-      return fastvalidate::haswell::basic::validate(UTF8.data(), s);
-    };
 
     RUN("lookup2avx", lookup2avx);
-    //RUN("rangeavx", rangeavx);
-    //RUN("zwegneravx", zwegneravx);
-    //RUN("basicavx", basicavx);
 
   }
 };
 
 int main() {
 
-  std::vector<size_t> input_size{4096};
+  std::vector<size_t> input_size{16384};
   for (const size_t size : input_size) {
     Benchmark bench(size);
     bench.run();

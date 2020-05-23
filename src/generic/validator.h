@@ -1,3 +1,4 @@
+
   template<class checker>
   error_code validate(const char * input, size_t length) {
     checker c{};
@@ -9,9 +10,9 @@
     }
 
     if (likely(reader.has_remainder())) {
-      uint8_t block[64];
+      uint8_t block[64]{};
       reader.get_remainder(block);
-      simd::simd8x64<uint8_t> in(reader.full_block());
+      simd::simd8x64<uint8_t> in(block);
       c.check_next_input(in);
       reader.advance();
     }

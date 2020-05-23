@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-
+#include <cstdio>
 #include "targets.h"
 
 namespace fastvalidate {

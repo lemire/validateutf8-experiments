@@ -26,7 +26,7 @@ std::vector<uint8_t> RandomUTF8::generate(size_t output_bytes)
                 result.push_back(candidate);
                 result.push_back(0x80 | val_6bit(gen));
                 break;
-            case 3: // 3 bytes
+            case 2: // 3 bytes
                 head = 0xe0 | val_4bit(gen);
                 result.push_back(head);
                 candidate = 0x80 | val_6bit(gen);
@@ -42,7 +42,7 @@ std::vector<uint8_t> RandomUTF8::generate(size_t output_bytes)
                 result.push_back(candidate);
                 result.push_back(0x80 | val_6bit(gen));
                 break;
-            case 4: // 4 bytes
+            case 3: // 4 bytes
                 head = 0xf0 | val_3bit(gen);
                 while(head > 0xF4) {
                     head = 0xf0 | val_3bit(gen);
