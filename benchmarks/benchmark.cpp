@@ -1,3 +1,6 @@
+#include <string>
+#include <fstream>
+#include <streambuf>
 #include "avx2/implementations.h"
 #include "event_counter.h"
 #include "random_utf8.h"
@@ -40,7 +43,7 @@ public:
 
   void run() {
     printf("\n");
-    printf("Running UTF8 => UTF16 benchmark.\n");
+    printf("Running UTF8 validation benchmark.\n");
     printf("The speed is normalized by the number of input bytes.\n");
     const size_t repeat = 10;
     RandomUTF8 gen_1byte(rd, 1, 0, 0, 0);
@@ -90,11 +93,70 @@ public:
   }
 };
 
+
+
+class RealDataBenchmark {
+
+  std::vector<std::string> filenames = {"examples/hongkong.html","examples/twitter.json"};
+
+
+
+public:
+  RealDataBenchmark() {}
+
+  void run() {
+    printf("\n");
+    printf("Running UTF8 validation benchmark.\n");
+    printf("The speed is normalized by the number of input bytes.\n");
+    const size_t repeat = 10;
+    for(std::string filename : filenames) {
+      std::ifstream in(filename);
+      if(!in) {
+        std::cerr << " I cannot load " << filename << std::endl;
+        continue;
+      }
+      std::vector<char> utf8((std::istreambuf_iterator<char>(in)),
+                 std::istreambuf_iterator<char>());
+      std::cout << "file: " << filename << " (" << utf8.size() / 1000 << "KB)" << std::endl;
+
+      run(utf8,repeat);
+
+    }
+  }
+
+
+  void run(std::vector<char>& UTF8, size_t repeat) {
+
+    size_t s{UTF8.size()};
+
+    size_t volume = UTF8.size() * sizeof(UTF8[0]);
+    auto fushia = [&UTF8, &s]() {
+      return fidl_validate_string((const unsigned char*)UTF8.data(), s);
+    };
+    RUN("fushia", fushia);
+
+
+    auto dfa = [&UTF8, &s]() {
+      return shiftless_validate_dfa_utf8((const char*) UTF8.data(), s);
+    };
+    RUN("dfa", dfa);
+    auto lookup2avx = [&UTF8, &s]() {
+      return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
+    };
+
+    RUN("lookup2avx", lookup2avx);
+
+  }
+};
+
 int main() {
+  RealDataBenchmark rdb;
+  rdb.run();
 
   std::vector<size_t> input_size{16384};
   for (const size_t size : input_size) {
     Benchmark bench(size);
     bench.run();
+
   }
 }

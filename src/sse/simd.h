@@ -1,6 +1,6 @@
 #ifndef FASTVALIDATE_WESTMERE_SIMD_H
 #define FASTVALIDATE_WESTMERE_SIMD_H
-
+#include <iostream>
 #include <x86intrin.h>
 
 #include "targets.h"
@@ -98,7 +98,24 @@ namespace simd {
 
     // Store to array
     really_inline void store(T dst[16]) const { return _mm_storeu_si128(reinterpret_cast<__m128i *>(dst), *this); }
+    really_inline void print() const {
+       T dst[16];
+       store(dst);
+       for(size_t i = 0; i < 16; i++) {
+         std::cout << dst[i];
+         if(i < 15) std::cout << ", ";
+       }
+    }
 
+    really_inline std::ostream& operator<<(std::ostream & out) const {
+       T dst[16];
+       store(dst);
+       for(size_t i = 0; i < 32; i++) {
+         out << dst[i];
+         if(i < 31) out << ", ";
+       }
+       return out;
+    }
     // Override to distinguish from bool version
     really_inline simd8<T> operator~() const { return *this ^ 0xFFu; }
 

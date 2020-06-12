@@ -2,6 +2,19 @@
 #include "avx2/implementations.h"
 
 
+void twobytetest() {
+  // this should not validate
+  const char * twobyte = "\xcf\xcf\xcf";
+  if(fastvalidate::haswell::lookup2::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
+        printf("twobytetest bug\n");
+        abort();
+  }
+  if(fastvalidate::haswell::lookup3::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
+        printf("twobytetest bug\n");
+        abort();
+  }  
+}
+
 void test() {
 
   // additional tests are from autobahn websocket testsuite https://github.com/crossbario/autobahn-testsuite/tree/master/autobahntestsuite/autobahntestsuite/case
@@ -40,6 +53,10 @@ void test() {
         printf("bug\n");
         abort();
     }
+    if(fastvalidate::haswell::lookup3::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
+        printf("bug\n");
+        abort();
+    }
   }
   for (size_t i = 0; i < 23; i++) {
     size_t len = strlen(badsequences[i]);
@@ -47,10 +64,16 @@ void test() {
         printf("bug\n");
         abort();
     }
+    if(fastvalidate::haswell::lookup3::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
+        printf("bug\n");
+        abort();
+    }
+
   }
   printf("tests ok.\n");
 }
 int main() {
+  twobytetest();
   test();
   return EXIT_SUCCESS;
 }

@@ -1,6 +1,7 @@
 #ifndef FASTVALIDATE_HASWELL_SIMD_H
 #define FASTVALIDATE_HASWELL_SIMD_H
 
+#include <iostream>
 #include <x86intrin.h>
 
 #include "targets.h"
@@ -101,7 +102,24 @@ namespace simd {
 
     // Store to array
     really_inline void store(T dst[32]) const { return _mm256_storeu_si256(reinterpret_cast<__m256i *>(dst), *this); }
-
+    // print
+    really_inline void print() const {
+       T dst[32];
+       store(dst);
+       for(size_t i = 0; i < 32; i++) {
+         std::cout << (int) dst[i];
+         if(i < 31) std::cout << ", ";
+       }
+    }
+    really_inline std::ostream& operator<<(std::ostream & out) const {
+       T dst[32];
+       store(dst);
+       for(size_t i = 0; i < 32; i++) {
+         out << dst[i];
+         if(i < 31) out << ", ";
+       }
+       return out;
+    }
     // Addition/subtraction are the same for signed and unsigned
     really_inline simd8<T> operator+(const simd8<T> other) const { return _mm256_add_epi8(*this, other); }
     really_inline simd8<T> operator-(const simd8<T> other) const { return _mm256_sub_epi8(*this, other); }
