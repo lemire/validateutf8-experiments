@@ -3,10 +3,6 @@
 This project contains benchmarks regarding fast UTF-8 validation. 
 
 
-## Limitations
-
-It is for research purposes. This is not meant for production use.
-
 
 
 ## Requirements
