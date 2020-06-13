@@ -20,9 +20,12 @@
   }
 
   error_code validate(const char * input, size_t length) {
+    printf("\n---- validating \n");
     return validate<utf8_checker>(input,length);
   }
 
   error_code validate(const uint8_t * input, size_t length) {
+        printf("\n---- validating \n");
+
     return validate<utf8_checker>(reinterpret_cast<const char *>(input),length);
   }

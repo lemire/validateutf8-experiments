@@ -2,6 +2,7 @@
 #define FASTVALIDATE_HASWELL_SIMD_H
 
 #include <iostream>
+#include  <iomanip>
 #include <x86intrin.h>
 
 #include "targets.h"
@@ -107,7 +108,7 @@ namespace simd {
        T dst[32];
        store(dst);
        for(size_t i = 0; i < 32; i++) {
-         std::cout << (int) dst[i];
+         std::cout << std::hex << std::setfill('0') << std::setw(2) << (int) dst[i];
          if(i < 31) std::cout << ", ";
        }
     }
@@ -116,7 +117,7 @@ namespace simd {
        store(dst);
        for(size_t i = 0; i < 32; i++) {
          out << dst[i];
-         if(i < 31) out << ", ";
+         if(i < 31) out << std::hex << std::setfill('0') << std::setw(2) << ", ";
        }
        return out;
     }

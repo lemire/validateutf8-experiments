@@ -87,9 +87,10 @@ using namespace simd;
     static const int TOO_LARGE   = 0x10; // 11110100 (1001|101_)____
     static const int TOO_LARGE_2 = 0x20; // 1111(1___|011_|0101) 10______
 
-    // New with lookup3. We want to catch the case where an ASCII character
+    // New with lookup3. We want to catch the case where an non-continuation 
     // follows a leading character
-    static const int TWO_BYTE = 0x40; // 110_ ____    0____ ____
+    static const int TWO_THREE_BYTE = 0x40; //  (110_|1110) ____    (0___|110_|1111) ____
+    static const int FOUR_BYTE = 0x80; //  1111 0___    (0___|110_|1111) ____
 
     // After processing the rest of byte 1 (the low bits), we're still not done--we have to check
     // byte 2 to be sure which things are errors and which aren't.
@@ -97,19 +98,18 @@ using namespace simd;
     static const int CARRY = OVERLONG_2 | TOO_LARGE_2;
     const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(
         // ASCII: ________ [0___]____
-        CARRY | TWO_BYTE, CARRY | TWO_BYTE, CARRY | TWO_BYTE, CARRY | TWO_BYTE,
+        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,
         // ASCII: ________ [0___]____
-        CARRY | TWO_BYTE, CARRY | TWO_BYTE, CARRY | TWO_BYTE, CARRY | TWO_BYTE,
+        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,
         // Continuations: ________ [10__]____
         CARRY | OVERLONG_3 | OVERLONG_4, // ________ [1000]____
         CARRY | OVERLONG_3 | TOO_LARGE,  // ________ [1001]____
         CARRY | TOO_LARGE  | SURROGATE,  // ________ [1010]____
         CARRY | TOO_LARGE  | SURROGATE,  // ________ [1011]____
         // Multibyte Leads: ________ [11__]____
-        CARRY, CARRY,  // 110_
-        CARRY, CARRY
+        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,  // 110_
+        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE
     );
-
     const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(
       // [0___]____ (ASCII)
       0, 0, 0, 0,                          
@@ -117,30 +117,39 @@ using namespace simd;
       // [10__]____ (continuation)
       0, 0, 0, 0,
       // [11__]____ (2+-byte leads)
-      OVERLONG_2 | TWO_BYTE, TWO_BYTE,                       // [110_]____ (2-byte lead)
-      OVERLONG_3 | SURROGATE,              // [1110]____ (3-byte lead)
-      OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 // [1111]____ (4+-byte lead)
+      OVERLONG_2 | TWO_THREE_BYTE, TWO_THREE_BYTE,                       // [110_]____ (2-byte lead)
+      OVERLONG_3 | SURROGATE | TWO_THREE_BYTE,              // [1110]____ (3-byte lead)
+      OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 | FOUR_BYTE // [1111]____ (4+-byte lead)
     );
 
     const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(
       // ____[00__] ________
-      OVERLONG_2 | OVERLONG_3 | OVERLONG_4, // ____[0000] ________
-      OVERLONG_2,                           // ____[0001] ________
-      0, 0,
+      OVERLONG_2 | OVERLONG_3 | OVERLONG_4 | TWO_THREE_BYTE | FOUR_BYTE, // ____[0000] ________
+      OVERLONG_2 | TWO_THREE_BYTE | FOUR_BYTE,                           // ____[0001] ________
+      TWO_THREE_BYTE | FOUR_BYTE, TWO_THREE_BYTE | FOUR_BYTE,
       // ____[01__] ________
-      TOO_LARGE,                            // ____[0100] ________
-      TOO_LARGE_2,
-      TOO_LARGE_2,
-      TOO_LARGE_2,
+      TOO_LARGE | TWO_THREE_BYTE | FOUR_BYTE,                            // ____[0100] ________
+      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
+      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
+      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
       // ____[10__] ________
-      TOO_LARGE_2, TOO_LARGE_2, TOO_LARGE_2, TOO_LARGE_2,
+      TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE,
       // ____[11__] ________
-      TOO_LARGE_2,
-      TOO_LARGE_2 | SURROGATE,                            // ____[1101] ________
-      TOO_LARGE_2, TOO_LARGE_2
+      TOO_LARGE_2 | TWO_THREE_BYTE,
+      TOO_LARGE_2 | SURROGATE | TWO_THREE_BYTE,                            // ____[1101] ________
+      TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE
     );
+/*
+    printf("byte_2_highev :");
+    byte_2_high.print();printf("\n");
+    printf("byte_1_high   :");
+    byte_1_high.print();printf("\n");
+    printf("byte_1_low    :");
+    byte_1_low.print();printf("\n");
+    printf("AND           :");
+    (byte_1_high & byte_1_low & byte_2_high).print();printf("\n");
 
-    return byte_1_high & byte_1_low & byte_2_high;
+  */  return byte_1_high & byte_1_low & byte_2_high;
   }
 
   really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> prev1) {
@@ -148,9 +157,27 @@ using namespace simd;
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
 
     // Cont is 10000000-101111111 (-65...-128)
-    simd8<bool> is_continuation = simd8<int8_t>(input) < int8_t(-64);
+    //simd8<bool> is_continuation = simd8<int8_t>(input) < int8_t(-64);
     // must_be_continuation is architecture-specific because Intel doesn't have unsigned comparisons
-    return simd8<uint8_t>(must_be_continuation(prev1, prev2, prev3) ^ is_continuation);
+    //return simd8<uint8_t>(must_be_continuation(prev1, prev2, prev3) ^ is_continuation);
+    printf("input:");
+
+input.print(); printf("\n");
+    printf("prev1:");
+
+prev1.print(); printf("\n");
+    simd8<bool> is_2_3_continuation = (simd8<int8_t>(input).max(simd8<int8_t>(prev1))) < int8_t(-64);
+    printf("is_2_3_continuation:");
+    simd8<uint8_t>(is_2_3_continuation).print(); printf("\n");
+    printf("must_be_2_3_continuation(prev2, prev3):");
+    simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3)).print(); printf("\n");
+        printf("XOR:");
+    simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation).print(); printf("\n");
+    return simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation);
+
+
+
+
   }
 
   //
@@ -184,18 +211,19 @@ using namespace simd;
     really_inline void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
-      printf("prev:");
+      printf("prev   :");
       prev_input.print();printf("\n");
-      printf("in:");
+      printf("in     :");
       input.print();printf("\n");
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
       auto calvaire = check_special_cases(input, prev1);
-            printf("special:");
-
+      printf("special:");
       calvaire.print();printf("\n");
 //      std::cout <<  ostie << std::endl;
       this->error |= check_special_cases(input, prev1);
       this->error |= check_multibyte_lengths(input, prev_input, prev1);
+      printf("check_multibyte_lengths:\n");
+      check_multibyte_lengths(input, prev_input, prev1).print(); printf("\n");
     }
 
     // The only problem that can happen at EOF is that a multibyte character is too short.

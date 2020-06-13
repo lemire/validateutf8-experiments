@@ -50,22 +50,22 @@ void test() {
   for (size_t i = 0; i < 8; i++) {
     size_t len = strlen(goodsequences[i]);
     if(fastvalidate::haswell::lookup2::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
-        printf("bug\n");
+        printf("bug goodsequences[%zu]\n", i);
         abort();
     }
     if(fastvalidate::haswell::lookup3::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
-        printf("bug\n");
+        printf("bug goodsequences[%zu]\n", i);
         abort();
     }
   }
   for (size_t i = 0; i < 23; i++) {
     size_t len = strlen(badsequences[i]);
     if(fastvalidate::haswell::lookup2::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
-        printf("bug\n");
+        printf("bug badsequences[%zu]\n", i);
         abort();
     }
     if(fastvalidate::haswell::lookup3::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
-        printf("bug\n");
+        printf("bug badsequences[%zu]\n", i);
         abort();
     }
 
