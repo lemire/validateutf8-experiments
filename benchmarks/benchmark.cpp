@@ -87,8 +87,12 @@ public:
     auto lookup2avx = [&UTF8, &s]() {
       return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
     };
+    auto lookup3avx = [&UTF8, &s]() {
+      return fastvalidate::haswell::lookup3::validate(UTF8.data(), s);
+    };
 
     RUN("lookup2avx", lookup2avx);
+    RUN("lookup3avx", lookup3avx);
 
   }
 };
@@ -143,8 +147,12 @@ public:
     auto lookup2avx = [&UTF8, &s]() {
       return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
     };
+    auto lookup3avx = [&UTF8, &s]() {
+      return fastvalidate::haswell::lookup3::validate(UTF8.data(), s);
+    };
 
     RUN("lookup2avx", lookup2avx);
+    RUN("lookup3avx", lookup3avx);
 
   }
 };
