@@ -112,15 +112,6 @@ namespace simd {
          if(i < 31) std::cout << ", ";
        }
     }
-    really_inline std::ostream& operator<<(std::ostream & out) const {
-       T dst[32];
-       store(dst);
-       for(size_t i = 0; i < 32; i++) {
-         out << dst[i];
-         if(i < 31) out << std::hex << std::setfill('0') << std::setw(2) << ", ";
-       }
-       return out;
-    }
     // Addition/subtraction are the same for signed and unsigned
     really_inline simd8<T> operator+(const simd8<T> other) const { return _mm256_add_epi8(*this, other); }
     really_inline simd8<T> operator-(const simd8<T> other) const { return _mm256_sub_epi8(*this, other); }

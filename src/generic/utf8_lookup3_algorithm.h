@@ -139,45 +139,16 @@ using namespace simd;
       TOO_LARGE_2 | SURROGATE | TWO_THREE_BYTE,                            // ____[1101] ________
       TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE
     );
-/*
-    printf("byte_2_highev :");
-    byte_2_high.print();printf("\n");
-    printf("byte_1_high   :");
-    byte_1_high.print();printf("\n");
-    printf("byte_1_low    :");
-    byte_1_low.print();printf("\n");
-    printf("AND           :");
-    (byte_1_high & byte_1_low & byte_2_high).print();printf("\n");
-
-  */  return byte_1_high & byte_1_low & byte_2_high;
+    return byte_1_high & byte_1_low & byte_2_high;
   }
 
   really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> prev1) {
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
-
-    // Cont is 10000000-101111111 (-65...-128)
-    //simd8<bool> is_continuation = simd8<int8_t>(input) < int8_t(-64);
-    // must_be_continuation is architecture-specific because Intel doesn't have unsigned comparisons
-    //return simd8<uint8_t>(must_be_continuation(prev1, prev2, prev3) ^ is_continuation);
-    printf("input:");
-
-input.print(); printf("\n");
-    printf("prev1:");
-
-prev1.print(); printf("\n");
+    // is_2_3_continuation uses one more instruction than lookup2
     simd8<bool> is_2_3_continuation = (simd8<int8_t>(input).max(simd8<int8_t>(prev1))) < int8_t(-64);
-    printf("is_2_3_continuation:");
-    simd8<uint8_t>(is_2_3_continuation).print(); printf("\n");
-    printf("must_be_2_3_continuation(prev2, prev3):");
-    simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3)).print(); printf("\n");
-        printf("XOR:");
-    simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation).print(); printf("\n");
+    // must_be_2_3_continuation has two fewer instructions than lookup 2
     return simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation);
-
-
-
-
   }
 
   //
@@ -211,19 +182,9 @@ prev1.print(); printf("\n");
     really_inline void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
-      printf("prev   :");
-      prev_input.print();printf("\n");
-      printf("in     :");
-      input.print();printf("\n");
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
-      auto calvaire = check_special_cases(input, prev1);
-      printf("special:");
-      calvaire.print();printf("\n");
-//      std::cout <<  ostie << std::endl;
       this->error |= check_special_cases(input, prev1);
       this->error |= check_multibyte_lengths(input, prev_input, prev1);
-      printf("check_multibyte_lengths:\n");
-      check_multibyte_lengths(input, prev_input, prev1).print(); printf("\n");
     }
 
     // The only problem that can happen at EOF is that a multibyte character is too short.
