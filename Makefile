@@ -6,8 +6,8 @@ all: unit benchmark
 
 CPPFLAGS:=-O3  -std=c++17 -Wextra -Wall
 
-unit: tests/unit.cpp $(ALLFILES)
-	c++ $(CPPFLAGS) -o unit tests/unit.cpp -I src
+unit: tests/unit.cpp $(ALLFILES) random_utf8.o
+	c++ $(CPPFLAGS) -o unit tests/unit.cpp -Isrc -Ibenchmarks random_utf8.o
 
 random_utf8.o: benchmarks/random_utf8.h  benchmarks/random_utf8.cpp
 	c++  $(CPPFLAGS) -c benchmarks/random_utf8.cpp -Ibenchmarks

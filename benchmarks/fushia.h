@@ -4,7 +4,6 @@
 #include "targets.h"
 
 fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_t size) {
-
   uint64_t pos = 0;
   uint64_t next_pos = 0;
   uint32_t code_point = 0;
@@ -51,7 +50,7 @@ fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_
           (0xd7ff < code_point && code_point < 0xe000)) {
         return fastvalidate::error_code::UTF8_ERROR;
       }
-    } else { // 0b11110000
+    } else if ((byte & 0b11111000) == 0b11110000) { // 0b11110000
       next_pos = pos + 4;
       if (next_pos > size) {
         return fastvalidate::error_code::UTF8_ERROR;
@@ -73,6 +72,9 @@ fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_
       if (code_point < 0xffff || 0x10ffff < code_point) {
         return fastvalidate::error_code::UTF8_ERROR;
       }
+    } else {
+      // we may have a continuation
+      return fastvalidate::error_code::UTF8_ERROR;
     }
     pos = next_pos;
   }

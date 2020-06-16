@@ -11,6 +11,57 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #error "Unsupported platform"
 #endif
 
+#include "random_utf8.h"
+#include "fushia.h"
+
+
+void display(const std::vector<uint8_t> & string) {
+  printf("[");
+  for(size_t i = 0; i < string.size(); i++) {
+    printf("0x%02x", string[i]);
+    if(i + 1 < string.size()) printf(",");
+  }
+  printf("]");
+}
+
+void brute_force_tests() {
+  printf("running brute-force tests\n");
+  std::random_device rd{};
+  RandomUTF8 gen_1_2_3_4(rd, 1, 1, 1, 1);
+  size_t total = 50000;
+  for(size_t i = 0; i < total; i++) {
+    if((i % (total/100)) == 0) {
+      printf("\r\r\r\r%2.0f %%", double(i)/double(total)*100.0); fflush(NULL);
+    }
+    auto UTF8 = gen_1_2_3_4.generate(rand() % 256);
+    if(active_fastvalidate::lookup2::validate(UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests %.*s\n", (int) UTF8.size(), UTF8.data());
+        abort();
+    }
+    if(active_fastvalidate::lookup3::validate(UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests %.*s\n", (int) UTF8.size(), UTF8.data());
+        abort();
+    }
+    for(size_t flip = 0; flip  < 10000; ++flip) {
+      // we are going to hack the string as long as it is UTF-8
+      UTF8[rand()% UTF8.size()] ^= uint8_t(1) << (rand() % 8); // we flip exactly one bit
+      auto e = fidl_validate_string(UTF8.data(), UTF8.size());      
+      auto e3 = active_fastvalidate::lookup3::validate(UTF8.data(), UTF8.size());
+      
+      if(e3 != e) {
+        printf("bug brute_force_tests lookup3 %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(e3 == fastvalidate::error_code::SUCCESS) {
+          printf("lookup3 says it is ok!\n");
+        } else {
+          printf("lookup3 says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }
+    }
+  }
+  printf("\r\r\r\r\n");
+}
 
 void twobytetest() {
   // this should not validate
@@ -55,7 +106,10 @@ void test() {
                           "\xce\xba\xe1\xbd\xb9\xcf\x83\xce", // 6.6.8
                           "\xce\xba\xe1\xbd\xb9\xcf\x83\xce\xbc\xce", // 6.6.10
                           "\xdf", // 6.14.6
-                          "\xef\xbf" // 6.14.7
+                          "\xef\xbf", // 6.14.7
+                          "\x80", 
+                          "\x91\x85\x95\x9e",
+                          "\x6c\x02\x8e\x18"
                         };
   for (size_t i = 0; i < 8; i++) {
     size_t len = strlen(goodsequences[i]);
@@ -68,14 +122,14 @@ void test() {
         abort();
     }
   }
-  for (size_t i = 0; i < 23; i++) {
+  for (size_t i = 0; i < 26; i++) {
     size_t len = strlen(badsequences[i]);
     if(active_fastvalidate::lookup2::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
-        printf("bug badsequences[%zu]\n", i);
+        printf("bug lookup2 badsequences[%zu]\n", i);
         abort();
     }
     if(active_fastvalidate::lookup3::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
-        printf("bug badsequences[%zu]\n", i);
+        printf("bug lookup3 badsequences[%zu]\n", i);
         abort();
     }
 
@@ -83,6 +137,7 @@ void test() {
   printf("tests ok.\n");
 }
 int main() {
+  brute_force_tests();
   twobytetest();
   test();
   return EXIT_SUCCESS;
