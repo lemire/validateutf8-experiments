@@ -98,13 +98,25 @@ public:
     auto lookup2avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup2::validate(UTF8.data(), s);
     };
+#ifdef __x86_64__
+    auto zwegneravx = [&UTF8, &s]() {
+      return active_fastvalidate::zwegner::validate(UTF8.data(), s);
+    };
+    RUN("zwegneravx", zwegneravx);
+#endif
     auto lookup3avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup3::validate(UTF8.data(), s);
     };
-
+    auto basicavx = [&UTF8, &s]() {
+      return active_fastvalidate::basic::validate(UTF8.data(), s);
+    };
+    auto rangeavx = [&UTF8, &s]() {
+      return active_fastvalidate::range::validate(UTF8.data(), s);
+    };
     RUN("lookup2avx", lookup2avx);
     RUN("lookup3avx", lookup3avx);
-
+    RUN("basicavx", basicavx);
+    RUN("rangeavx", rangeavx);
   }
 };
 
@@ -158,12 +170,25 @@ public:
     auto lookup2avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup2::validate(UTF8.data(), s);
     };
+#ifdef __x86_64__
+    auto zwegneravx = [&UTF8, &s]() {
+      return active_fastvalidate::zwegner::validate(UTF8.data(), s);
+    };
+    RUN("zwegneravx", zwegneravx);
+#endif
     auto lookup3avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup3::validate(UTF8.data(), s);
     };
-
+    auto basicavx = [&UTF8, &s]() {
+      return active_fastvalidate::basic::validate(UTF8.data(), s);
+    };
+    auto rangeavx = [&UTF8, &s]() {
+      return active_fastvalidate::range::validate(UTF8.data(), s);
+    };
     RUN("lookup2avx", lookup2avx);
     RUN("lookup3avx", lookup3avx);
+    RUN("basicavx", basicavx);
+    RUN("rangeavx", rangeavx);
 
   }
 };
