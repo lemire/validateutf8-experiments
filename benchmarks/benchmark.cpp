@@ -1,12 +1,22 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include "avx2/implementations.h"
 #include "event_counter.h"
 #include "random_utf8.h"
-#include "sse/implementations.h"
 #include "fushia.h"
 #include "hoehrmann.h"
+
+#ifdef __x86_64__
+#include "avx2/implementations.h"
+#include "sse/implementations.h"
+namespace active_fastvalidate = fastvalidate::haswell;
+#elif defined(__aarch64__)
+#include "neon/implementations.h"
+namespace active_fastvalidate = fastvalidate::arm64;
+#else
+#error "Unsupported platform"
+#endif
+
 #define RUNINS(name, procedure)                                                      \
   {                                                                            \
     event_collector collector;                                                 \
@@ -85,10 +95,10 @@ public:
     };
     RUN("dfa", dfa);
     auto lookup2avx = [&UTF8, &s]() {
-      return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
+      return active_fastvalidate::lookup2::validate(UTF8.data(), s);
     };
     auto lookup3avx = [&UTF8, &s]() {
-      return fastvalidate::haswell::lookup3::validate(UTF8.data(), s);
+      return active_fastvalidate::lookup3::validate(UTF8.data(), s);
     };
 
     RUN("lookup2avx", lookup2avx);
@@ -145,10 +155,10 @@ public:
     };
     RUN("dfa", dfa);
     auto lookup2avx = [&UTF8, &s]() {
-      return fastvalidate::haswell::lookup2::validate(UTF8.data(), s);
+      return active_fastvalidate::lookup2::validate(UTF8.data(), s);
     };
     auto lookup3avx = [&UTF8, &s]() {
-      return fastvalidate::haswell::lookup3::validate(UTF8.data(), s);
+      return active_fastvalidate::lookup3::validate(UTF8.data(), s);
     };
 
     RUN("lookup2avx", lookup2avx);

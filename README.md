@@ -8,7 +8,7 @@ This project contains benchmarks regarding fast UTF-8 validation.
 ## Requirements
 
 - Linux/macOS with make and a recent C++ compiler.
-- A PC with a recent x64 processor.
+- A PC with a recent x64 processor (e.g., Intel Skylake or better, AMD Zen 2 or better)
 
 ## Usage
 

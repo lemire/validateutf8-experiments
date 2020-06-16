@@ -89,8 +89,8 @@ using namespace simd;
 
     // New with lookup3. We want to catch the case where an non-continuation 
     // follows a leading character
-    static const int TWO_THREE_BYTE = 0x40; //  (110_|1110) ____    (0___|110_|1111) ____
-    static const int FOUR_BYTE = 0x80; //  1111 0___    (0___|110_|1111) ____
+    static const int TOO_SHORT_2_3 = 0x40; //  (110_|1110) ____    (0___|110_|1111) ____
+    static const int TOO_SHORT_4 = 0x80; //  1111 0___    (0___|110_|1111) ____
 
     // After processing the rest of byte 1 (the low bits), we're still not done--we have to check
     // byte 2 to be sure which things are errors and which aren't.
@@ -98,17 +98,17 @@ using namespace simd;
     static const int CARRY = OVERLONG_2 | TOO_LARGE_2;
     const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(
         // ASCII: ________ [0___]____
-        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,
+        CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4,
         // ASCII: ________ [0___]____
-        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,
+        CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4,
         // Continuations: ________ [10__]____
         CARRY | OVERLONG_3 | OVERLONG_4, // ________ [1000]____
         CARRY | OVERLONG_3 | TOO_LARGE,  // ________ [1001]____
         CARRY | TOO_LARGE  | SURROGATE,  // ________ [1010]____
         CARRY | TOO_LARGE  | SURROGATE,  // ________ [1011]____
         // Multibyte Leads: ________ [11__]____
-        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE,  // 110_
-        CARRY | TWO_THREE_BYTE | FOUR_BYTE, CARRY | TWO_THREE_BYTE | FOUR_BYTE
+        CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4,  // 110_
+        CARRY | TOO_SHORT_2_3 | TOO_SHORT_4, CARRY | TOO_SHORT_2_3 | TOO_SHORT_4
     );
     const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(
       // [0___]____ (ASCII)
@@ -117,27 +117,27 @@ using namespace simd;
       // [10__]____ (continuation)
       0, 0, 0, 0,
       // [11__]____ (2+-byte leads)
-      OVERLONG_2 | TWO_THREE_BYTE, TWO_THREE_BYTE,                       // [110_]____ (2-byte lead)
-      OVERLONG_3 | SURROGATE | TWO_THREE_BYTE,              // [1110]____ (3-byte lead)
-      OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 | FOUR_BYTE // [1111]____ (4+-byte lead)
+      OVERLONG_2 | TOO_SHORT_2_3, TOO_SHORT_2_3,                       // [110_]____ (2-byte lead)
+      OVERLONG_3 | SURROGATE | TOO_SHORT_2_3,              // [1110]____ (3-byte lead)
+      OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 | TOO_SHORT_4 // [1111]____ (4+-byte lead)
     );
 
     const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(
       // ____[00__] ________
-      OVERLONG_2 | OVERLONG_3 | OVERLONG_4 | TWO_THREE_BYTE | FOUR_BYTE, // ____[0000] ________
-      OVERLONG_2 | TWO_THREE_BYTE | FOUR_BYTE,                           // ____[0001] ________
-      TWO_THREE_BYTE | FOUR_BYTE, TWO_THREE_BYTE | FOUR_BYTE,
+      OVERLONG_2 | OVERLONG_3 | OVERLONG_4 | TOO_SHORT_2_3 | TOO_SHORT_4, // ____[0000] ________
+      OVERLONG_2 | TOO_SHORT_2_3 | TOO_SHORT_4,                           // ____[0001] ________
+      TOO_SHORT_2_3 | TOO_SHORT_4, TOO_SHORT_2_3 | TOO_SHORT_4,
       // ____[01__] ________
-      TOO_LARGE | TWO_THREE_BYTE | FOUR_BYTE,                            // ____[0100] ________
-      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
-      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
-      TOO_LARGE_2 | TWO_THREE_BYTE | FOUR_BYTE,
+      TOO_LARGE | TOO_SHORT_2_3 | TOO_SHORT_4,                            // ____[0100] ________
+      TOO_LARGE_2 | TOO_SHORT_2_3 | TOO_SHORT_4,
+      TOO_LARGE_2 | TOO_SHORT_2_3 | TOO_SHORT_4,
+      TOO_LARGE_2 | TOO_SHORT_2_3 | TOO_SHORT_4,
       // ____[10__] ________
-      TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE,
+      TOO_LARGE_2 | TOO_SHORT_2_3, TOO_LARGE_2 | TOO_SHORT_2_3, TOO_LARGE_2 | TOO_SHORT_2_3, TOO_LARGE_2 | TOO_SHORT_2_3,
       // ____[11__] ________
-      TOO_LARGE_2 | TWO_THREE_BYTE,
-      TOO_LARGE_2 | SURROGATE | TWO_THREE_BYTE,                            // ____[1101] ________
-      TOO_LARGE_2 | TWO_THREE_BYTE, TOO_LARGE_2 | TWO_THREE_BYTE
+      TOO_LARGE_2 | TOO_SHORT_2_3,
+      TOO_LARGE_2 | SURROGATE | TOO_SHORT_2_3,                            // ____[1101] ________
+      TOO_LARGE_2 | TOO_SHORT_2_3, TOO_LARGE_2 | TOO_SHORT_2_3
     );
     return byte_1_high & byte_1_low & byte_2_high;
   }

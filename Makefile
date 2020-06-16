@@ -1,6 +1,6 @@
 
 
-ALLFILES=$(wildcard src/*.h) $(wildcard src/avx2/*.h) $(wildcard src/generic/*.h) $(wildcard src/sse/*.h)
+ALLFILES=$(wildcard src/*.h) $(wildcard src/avx2/*.h) $(wildcard src/generic/*.h) $(wildcard src/sse/*.h) $(wildcard src/neon/*.h)
 BENCHMARKFILES=$(wildcard benchmarks/*.h)  $(wildcard benchmarks/*.cpp)
 all: unit benchmark
 

@@ -2,7 +2,7 @@
 #define FASTVALIDATE_HASWELL_SIMD_H
 
 #include <iostream>
-#include  <iomanip>
+#include <iomanip>
 #include <x86intrin.h>
 
 #include "targets.h"

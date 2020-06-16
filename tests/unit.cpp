@@ -1,15 +1,23 @@
-#include "sse/implementations.h"
+#ifdef __x86_64__
 #include "avx2/implementations.h"
+#include "sse/implementations.h"
+namespace active_fastvalidate = fastvalidate::haswell;
+#elif defined(__aarch64__)
+#include "neon/implementations.h"
+namespace active_fastvalidate = fastvalidate::arm64;
+#else
+#error "Unsupported platform"
+#endif
 
 
 void twobytetest() {
   // this should not validate
   const char * twobyte = "\xcf\xcf\xcf";
-  if(fastvalidate::haswell::lookup2::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
+  if(active_fastvalidate::lookup2::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
         printf("twobytetest bug\n");
         abort();
   }
-  if(fastvalidate::haswell::lookup3::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
+  if(active_fastvalidate::lookup3::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
         printf("twobytetest bug\n");
         abort();
   }  
@@ -49,22 +57,22 @@ void test() {
                         };
   for (size_t i = 0; i < 8; i++) {
     size_t len = strlen(goodsequences[i]);
-    if(fastvalidate::haswell::lookup2::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
+    if(active_fastvalidate::lookup2::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
         printf("bug goodsequences[%zu]\n", i);
         abort();
     }
-    if(fastvalidate::haswell::lookup3::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
+    if(active_fastvalidate::lookup3::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
         printf("bug goodsequences[%zu]\n", i);
         abort();
     }
   }
   for (size_t i = 0; i < 23; i++) {
     size_t len = strlen(badsequences[i]);
-    if(fastvalidate::haswell::lookup2::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
+    if(active_fastvalidate::lookup2::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
         printf("bug badsequences[%zu]\n", i);
         abort();
     }
-    if(fastvalidate::haswell::lookup3::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
+    if(active_fastvalidate::lookup3::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
         printf("bug badsequences[%zu]\n", i);
         abort();
     }
