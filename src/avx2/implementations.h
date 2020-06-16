@@ -50,10 +50,6 @@ really_inline simd8<bool> must_be_2_3_continuation(simd8<uint8_t> prev2, simd8<u
 }
 
 
-namespace zwegner {
-#include "generic/utf8_zwegner_algorithm.h"
-}
-
 namespace range {
 #include "generic/utf8_range_algorithm.h"
 }

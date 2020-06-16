@@ -142,6 +142,7 @@ namespace simd {
     template<int N>
     really_inline simd8<uint8_t> shl() const { return vshlq_n_u8(*this, N); }
 
+
     // Perform a lookup assuming the value is between 0 and 16 (undefined behavior for out of range values)
     template<typename L>
     really_inline simd8<L> lookup_16(simd8<L> lookup_table) const {
