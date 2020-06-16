@@ -91,7 +91,7 @@ public:
 
 
     auto dfa = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8((const char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8((const signed char*) UTF8.data(), s);
     };
     RUN("dfa", dfa);
     auto lookup2avx = [&UTF8, &s]() {
@@ -151,7 +151,7 @@ public:
 
 
     auto dfa = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8((const char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8((const signed char*) UTF8.data(), s);
     };
     RUN("dfa", dfa);
     auto lookup2avx = [&UTF8, &s]() {
