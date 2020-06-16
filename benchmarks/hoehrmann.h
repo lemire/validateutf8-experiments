@@ -95,7 +95,7 @@ static uint32_t inline shiftless_updatestate(uint32_t *state, uint32_t byte) {
   return *state;
 }
 
-static inline fastvalidate::error_code  is_ascii(const char *c, size_t len) {
+static inline fastvalidate::error_code  is_ascii(const signed char *c, size_t len) {
   for (size_t i = 0; i < len; i++) {
     if (c[i] < 0)
       return fastvalidate::error_code::UTF8_ERROR;
@@ -104,7 +104,7 @@ static inline fastvalidate::error_code  is_ascii(const char *c, size_t len) {
 }
 
 
-static inline fastvalidate::error_code  validate_dfa_utf8(const char *c, size_t len) {
+static inline fastvalidate::error_code  validate_dfa_utf8(const signed char *c, size_t len) {
   const unsigned char *cu = (const unsigned char *)c;
   uint32_t state = 0;
   for (size_t i = 0; i < len; i++) {
@@ -115,7 +115,7 @@ static inline fastvalidate::error_code  validate_dfa_utf8(const char *c, size_t 
   return fastvalidate::error_code::SUCCESS;
 }
 
-static inline fastvalidate::error_code  shiftless_validate_dfa_utf8(const char *c, size_t len) {
+static inline fastvalidate::error_code  shiftless_validate_dfa_utf8(const signed char *c, size_t len) {
   const unsigned char *cu = (const unsigned char *)c;
   uint32_t state = 0;
   for (size_t i = 0; i < len; i++) {
