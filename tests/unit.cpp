@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #ifdef __x86_64__
 #include "avx2/implementations.h"
 #include "sse/implementations.h"
