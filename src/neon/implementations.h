@@ -1,8 +1,7 @@
 #include "block_buf_reader.h"
-#include "avx2/simd.h"
+#include "neon/simd.h"
 
 
-TARGET_HASWELL
 namespace fastvalidate {
 namespace arm64 {
 namespace lookup2 {
@@ -72,4 +71,3 @@ namespace basic {
 
 }
 }
-UNTARGET_REGION
