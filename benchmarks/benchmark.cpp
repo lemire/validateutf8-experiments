@@ -99,6 +99,16 @@ public:
       return shiftless_validate_dfa_utf8_double((const signed char*) UTF8.data(), s);
     };
     RUN("dfa2", dfa2);
+
+    auto dfa3 = [&UTF8, &s]() {
+      return shiftless_validate_dfa_utf8_three((const signed char*) UTF8.data(), s);
+    };
+    RUN("dfa3", dfa3);
+    auto dfa4 = [&UTF8, &s]() {
+      return shiftless_validate_dfa_utf8_quad((const signed char*) UTF8.data(), s);
+    };
+    RUN("dfa4", dfa4);
+
     auto lookup2avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup2::validate(UTF8.data(), s);
     };
@@ -175,6 +185,15 @@ public:
       return shiftless_validate_dfa_utf8_double((const signed char*) UTF8.data(), s);
     };
     RUN("dfa2", dfa2);
+
+    auto dfa3 = [&UTF8, &s]() {
+      return shiftless_validate_dfa_utf8_three((const signed char*) UTF8.data(), s);
+    };
+    RUN("dfa3", dfa3);
+    auto dfa4 = [&UTF8, &s]() {
+      return shiftless_validate_dfa_utf8_quad((const signed char*) UTF8.data(), s);
+    };
+    RUN("dfa4", dfa4);
 
     auto lookup2avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup2::validate(UTF8.data(), s);

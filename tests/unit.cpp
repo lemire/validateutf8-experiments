@@ -56,6 +56,16 @@ void brute_force_tests() {
         display(UTF8);
         abort();
     }
+    if(shiftless_validate_dfa_utf8_three((const signed char *)UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests dfa three %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
+        abort();
+    }
+    if(shiftless_validate_dfa_utf8_quad((const signed char *)UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests dfa quad %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
+        abort();
+    }
     for(size_t flip = 0; flip  < 10000; ++flip) {
       // we are going to hack the string as long as it is UTF-8
       UTF8[rand()% UTF8.size()] ^= uint8_t(1) << (rand() % 8); // we flip exactly one bit
@@ -92,6 +102,31 @@ void brute_force_tests() {
           printf("double dfa says it is ok!\n");
         } else {
           printf("double dfa says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }
+      auto esq = shiftless_validate_dfa_utf8_quad((const signed char *)UTF8.data(), UTF8.size());
+      
+      if(esq != e) {
+        printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(esq == fastvalidate::error_code::SUCCESS) {
+          printf("quad dfa says it is ok!\n");
+        } else {
+          printf("quad dfa says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }
+
+      auto est = shiftless_validate_dfa_utf8_three((const signed char *)UTF8.data(), UTF8.size());
+      
+      if(est != e) {
+        printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(est == fastvalidate::error_code::SUCCESS) {
+          printf("three dfa says it is ok!\n");
+        } else {
+          printf("three dfa says it is not ok!\n");
         }
         display(UTF8);
         abort();
