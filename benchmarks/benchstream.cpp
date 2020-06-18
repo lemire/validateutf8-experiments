@@ -68,7 +68,7 @@ public:
     event_collector collector;
     for (size_t k = 0; k < samples; k++) {
       size_t size = size_t(
-          double(k + 1) / double(samples) * (max_size - min_size) + min_size);
+          double(k) / double(samples - 1) * (max_size - min_size) + min_size);
       const auto UTF8 = generator.generate(size);
       size_t s{UTF8.size()};
       size_t volume{s};
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
   size_t repeat = atoll(argv[1]);
   printf("# number of repetitions %zu \n", repeat);
 
-  Benchmark bench{samples, repeat, 0, 65536};
+  Benchmark bench{samples, repeat, 1024, 65536};
   bench.run();
 
   return EXIT_SUCCESS;
