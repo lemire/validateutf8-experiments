@@ -9,6 +9,10 @@
 // the work by Hoehrmann.
 #include <cstdint>
 
+#ifndef really_inline
+#define really_inline inline __attribute__((always_inline, unused))
+#endif
+
 #define UTF8_ACCEPT 0
 #define UTF8_REJECT 1
 #define SHIFTLESS_UTF8_REJECT 16
@@ -71,7 +75,7 @@ static const uint8_t shifted_utf8d_transition[] = {
     0x10, 0x30, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x30, 0x10, 0x10,
     0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 
-static uint32_t inline decode(uint32_t *state, uint32_t *codep, uint32_t byte) {
+static uint32_t really_inline decode(uint32_t *state, uint32_t *codep, uint32_t byte) {
   uint32_t type = utf8d[byte];
   *codep = (*state != UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
                                    : (0xff >> type) & (byte);
@@ -79,7 +83,7 @@ static uint32_t inline decode(uint32_t *state, uint32_t *codep, uint32_t byte) {
   return *state;
 }
 
-static uint32_t inline shiftless_decode(uint32_t *state, uint32_t *codep,
+static uint32_t really_inline shiftless_decode(uint32_t *state, uint32_t *codep,
                                         uint32_t byte) {
   uint32_t type = utf8d[byte];
   *codep = (*state != UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
@@ -88,13 +92,13 @@ static uint32_t inline shiftless_decode(uint32_t *state, uint32_t *codep,
   return *state;
 }
 
-static uint32_t inline updatestate(uint32_t *state, uint32_t byte) {
+static uint32_t really_inline updatestate(uint32_t *state, uint32_t byte) {
   uint32_t type = utf8d[byte];
   *state = utf8d_transition[16 * *state + type];
   return *state;
 }
 
-static uint32_t inline shiftless_updatestate(uint32_t *state, uint32_t byte) {
+static uint32_t really_inline shiftless_updatestate(uint32_t *state, uint32_t byte) {
   uint32_t type = utf8d[byte];
   *state = shifted_utf8d_transition[*state + type];
   return *state;
@@ -135,7 +139,7 @@ shiftless_validate_dfa_utf8(const signed char *c, size_t len) {
   return fastvalidate::error_code::SUCCESS;
 }
 
-static inline bool is_leading(int8_t c) {
+static really_inline bool is_leading(int8_t c) {
   return c >= -64; // this covers ASCII + other leading bytes
 }
 
