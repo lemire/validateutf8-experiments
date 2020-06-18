@@ -13,6 +13,8 @@ namespace active_fastvalidate = fastvalidate::arm64;
 
 #include "random_utf8.h"
 #include "fushia.h"
+#include "hoehrmann.h"
+
 
 
 void display(const std::vector<uint8_t> & string) {
@@ -36,10 +38,22 @@ void brute_force_tests() {
     auto UTF8 = gen_1_2_3_4.generate(rand() % 256);
     if(active_fastvalidate::lookup2::validate(UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
         printf("bug brute_force_tests %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
         abort();
     }
     if(active_fastvalidate::lookup3::validate(UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
         printf("bug brute_force_tests %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
+        abort();
+    }
+    if(shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
+        abort();
+    }
+    if(shiftless_validate_dfa_utf8_double((const signed char *)UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests dfa double %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
         abort();
     }
     for(size_t flip = 0; flip  < 10000; ++flip) {
@@ -58,6 +72,31 @@ void brute_force_tests() {
         display(UTF8);
         abort();
       }
+      auto es = shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), UTF8.size());
+      
+      if(es != e) {
+        printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(es == fastvalidate::error_code::SUCCESS) {
+          printf("dfa says it is ok!\n");
+        } else {
+          printf("dfa says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }
+      auto esd = shiftless_validate_dfa_utf8_double((const signed char *)UTF8.data(), UTF8.size());
+      
+      if(esd != e) {
+        printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(esd == fastvalidate::error_code::SUCCESS) {
+          printf("double dfa says it is ok!\n");
+        } else {
+          printf("double dfa says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }
+
     }
   }
   printf("\r\r\r\r\n");
