@@ -44,6 +44,8 @@ namespace active_fastvalidate = fastvalidate::arm64;
   printf("%40s ", name);\
   RUNINS(name,procedure)
 
+std::vector<uint8_t> buffer;
+
 class Benchmark {
 
   size_t size;
@@ -85,6 +87,14 @@ public:
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);
+    buffer.resize(volume);
+
+    auto mem = [&UTF8, &s]() {
+      memcpy(buffer.data(), UTF8.data(), s);
+      return fastvalidate::error_code::SUCCESS;
+    };
+    RUN("memcpy", mem);
+
     auto fushia = [&UTF8, &s]() {
       return fidl_validate_string(UTF8.data(), s);
     };
@@ -171,6 +181,15 @@ public:
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);
+
+    buffer.resize(volume);
+
+    auto mem = [&UTF8, &s]() {
+      memcpy(buffer.data(), UTF8.data(), s);
+      return fastvalidate::error_code::SUCCESS;
+    };
+    RUN("memcpy", mem);
+
     auto fushia = [&UTF8, &s]() {
       return fidl_validate_string((const unsigned char*)UTF8.data(), s);
     };
