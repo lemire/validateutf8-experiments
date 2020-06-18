@@ -75,7 +75,8 @@ static const uint8_t shifted_utf8d_transition[] = {
     0x10, 0x30, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x30, 0x10, 0x10,
     0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 
-static uint32_t really_inline decode(uint32_t *state, uint32_t *codep, uint32_t byte) {
+static uint32_t really_inline decode(uint32_t *state, uint32_t *codep,
+                                     uint32_t byte) {
   uint32_t type = utf8d[byte];
   *codep = (*state != UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
                                    : (0xff >> type) & (byte);
@@ -84,7 +85,7 @@ static uint32_t really_inline decode(uint32_t *state, uint32_t *codep, uint32_t 
 }
 
 static uint32_t really_inline shiftless_decode(uint32_t *state, uint32_t *codep,
-                                        uint32_t byte) {
+                                               uint32_t byte) {
   uint32_t type = utf8d[byte];
   *codep = (*state != UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
                                    : (0xff >> type) & (byte);
@@ -98,7 +99,8 @@ static uint32_t really_inline updatestate(uint32_t *state, uint32_t byte) {
   return *state;
 }
 
-static uint32_t really_inline shiftless_updatestate(uint32_t *state, uint32_t byte) {
+static uint32_t really_inline shiftless_updatestate(uint32_t *state,
+                                                    uint32_t byte) {
   uint32_t type = utf8d[byte];
   *state = shifted_utf8d_transition[*state + type];
   return *state;
@@ -248,8 +250,7 @@ shiftless_validate_dfa_utf8_three(const signed char *c, size_t len) {
   }
 
   if (middle_point2 - middle_point1 > smallest_run) {
-    for (size_t i = smallest_run;
-         i < middle_point2 - middle_point1; i++) {
+    for (size_t i = smallest_run; i < middle_point2 - middle_point1; i++) {
       uint32_t byteval2 = (uint32_t)cu2[i];
       if (shiftless_updatestate(&state2, byteval2) == SHIFTLESS_UTF8_REJECT) {
         return fastvalidate::error_code::UTF8_ERROR;
@@ -273,8 +274,6 @@ shiftless_validate_dfa_utf8_three(const signed char *c, size_t len) {
   }
   return fastvalidate::error_code::SUCCESS;
 }
-
-
 
 static inline fastvalidate::error_code
 shiftless_validate_dfa_utf8_quad(const signed char *c, size_t len) {
@@ -336,7 +335,7 @@ shiftless_validate_dfa_utf8_quad(const signed char *c, size_t len) {
 
     if ((shiftless_updatestate(&state1, byteval1) == SHIFTLESS_UTF8_REJECT) ||
         (shiftless_updatestate(&state2, byteval2) == SHIFTLESS_UTF8_REJECT) ||
-        (shiftless_updatestate(&state3, byteval3) == SHIFTLESS_UTF8_REJECT)||
+        (shiftless_updatestate(&state3, byteval3) == SHIFTLESS_UTF8_REJECT) ||
         (shiftless_updatestate(&state4, byteval4) == SHIFTLESS_UTF8_REJECT)) {
       return fastvalidate::error_code::UTF8_ERROR;
     }
@@ -354,8 +353,7 @@ shiftless_validate_dfa_utf8_quad(const signed char *c, size_t len) {
   }
 
   if (middle_point2 - middle_point1 > smallest_run) {
-    for (size_t i = smallest_run;
-         i < middle_point2 - middle_point1; i++) {
+    for (size_t i = smallest_run; i < middle_point2 - middle_point1; i++) {
       uint32_t byteval2 = (uint32_t)cu2[i];
       if (shiftless_updatestate(&state2, byteval2) == SHIFTLESS_UTF8_REJECT) {
         return fastvalidate::error_code::UTF8_ERROR;
@@ -366,8 +364,7 @@ shiftless_validate_dfa_utf8_quad(const signed char *c, size_t len) {
     return fastvalidate::error_code::UTF8_ERROR;
   }
   if (middle_point3 - middle_point2 > smallest_run) {
-    for (size_t i = smallest_run;
-         i < middle_point3 - middle_point2; i++) {
+    for (size_t i = smallest_run; i < middle_point3 - middle_point2; i++) {
       uint32_t byteval3 = (uint32_t)cu3[i];
       if (shiftless_updatestate(&state3, byteval3) == SHIFTLESS_UTF8_REJECT) {
         return fastvalidate::error_code::UTF8_ERROR;

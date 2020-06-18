@@ -1,11 +1,11 @@
-#include <cstdlib>
-#include <string>
-#include <fstream>
-#include <streambuf>
 #include "event_counter.h"
-#include "random_utf8.h"
 #include "fushia.h"
 #include "hoehrmann.h"
+#include "random_utf8.h"
+#include <cstdlib>
+#include <fstream>
+#include <streambuf>
+#include <string>
 
 #ifdef __x86_64__
 #include "avx2/implementations.h"
@@ -18,31 +18,35 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #error "Unsupported platform"
 #endif
 
-#define RUNINS(name, procedure)                                                      \
+#define RUNINS(name, procedure)                                                \
   {                                                                            \
     event_collector collector;                                                 \
     event_aggregate all{};                                                     \
     for (size_t i = 0; i < repeat; i++) {                                      \
       collector.start();                                                       \
-      if(procedure() != fastvalidate::error_code::SUCCESS) {printf("Bug %s\n",name);break;}                                                             \
+      if (procedure() != fastvalidate::error_code::SUCCESS) {                  \
+        printf("Bug %s\n", name);                                              \
+        break;                                                                 \
+      }                                                                        \
       event_count allocate_count = collector.end();                            \
       all << allocate_count;                                                   \
     }                                                                          \
     double freq = (all.best.cycles() / all.best.elapsed_sec()) / 1000000000.0; \
     double insperunit = all.best.instructions() / double(volume);              \
-    double branchmissperunit = all.best.branch_misses() / double(volume);              \
+    double branchmissperunit = all.best.branch_misses() / double(volume);      \
     double gbs = double(volume) / all.best.elapsed_ns();                       \
     if (collector.has_events()) {                                              \
-      printf("                               %8.3f ins/byte, %8.3f %% branch miss/byte,   %8.3f GHz, "      \
+      printf("                               %8.3f ins/byte, %8.3f branch "    \
+             "miss/kbyte,   %8.3f GHz, "                                       \
              "%8.3f GB/s \n",                                                  \
-             insperunit, branchmissperunit * 100 ,freq, gbs);                                           \
+             insperunit, branchmissperunit * 1000, freq, gbs);                 \
     } else {                                                                   \
       printf("                               %8.3f GB/s \n", gbs);             \
     }                                                                          \
   }
 #define RUN(name, procedure)                                                   \
-  printf("%40s ", name);\
-  RUNINS(name,procedure)
+  printf("%40s ", name);                                                       \
+  RUNINS(name, procedure)
 
 std::vector<uint8_t> buffer;
 
@@ -73,10 +77,10 @@ public:
 
     puts("- 1 or 2 UTF8 bytes");
     run(gen_1_2, repeat);
-    
+
     puts("- 1, 2, 3 UTF8 bytes");
     run(gen_1_2_3, repeat);
-    
+
     puts("- 1, 2, 3, 4 UTF8 bytes");
     run(gen_1_2_3_4, repeat);
   }
@@ -100,22 +104,24 @@ public:
     };
     RUN("fushia", fushia);
 
-
     auto dfa = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
     RUN("dfa", dfa);
     auto dfa2 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_double((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_double(
+          (const signed char *)UTF8.data(), s);
     };
     RUN("dfa2", dfa2);
 
     auto dfa3 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_three((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_three((const signed char *)UTF8.data(),
+                                               s);
     };
     RUN("dfa3", dfa3);
     auto dfa4 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_quad((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_quad((const signed char *)UTF8.data(),
+                                              s);
     };
     RUN("dfa4", dfa4);
 
@@ -144,13 +150,10 @@ public:
   }
 };
 
-
-
 class RealDataBenchmark {
 
-  std::vector<std::string> filenames = {"examples/hongkong.html","examples/twitter.json"};
-
-
+  std::vector<std::string> filenames = {"examples/hongkong.html",
+                                        "examples/twitter.json"};
 
 public:
   RealDataBenchmark() {}
@@ -160,23 +163,22 @@ public:
     printf("Running UTF8 validation benchmark.\n");
     printf("The speed is normalized by the number of input bytes.\n");
     const size_t repeat = 10;
-    for(std::string filename : filenames) {
+    for (std::string filename : filenames) {
       std::ifstream in(filename);
-      if(!in) {
+      if (!in) {
         std::cerr << " I cannot load " << filename << std::endl;
         continue;
       }
       std::vector<char> utf8((std::istreambuf_iterator<char>(in)),
-                 std::istreambuf_iterator<char>());
-      std::cout << "file: " << filename << " (" << utf8.size() / 1000 << "KB)" << std::endl;
+                             std::istreambuf_iterator<char>());
+      std::cout << "file: " << filename << " (" << utf8.size() / 1000 << "KB)"
+                << std::endl;
 
-      run(utf8,repeat);
-
+      run(utf8, repeat);
     }
   }
 
-
-  void run(std::vector<char>& UTF8, size_t repeat) {
+  void run(std::vector<char> &UTF8, size_t repeat) {
 
     size_t s{UTF8.size()};
 
@@ -191,26 +193,28 @@ public:
     RUN("memcpy", mem);
 
     auto fushia = [&UTF8, &s]() {
-      return fidl_validate_string((const unsigned char*)UTF8.data(), s);
+      return fidl_validate_string((const unsigned char *)UTF8.data(), s);
     };
     RUN("fushia", fushia);
 
-
     auto dfa = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
     RUN("dfa", dfa);
     auto dfa2 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_double((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_double(
+          (const signed char *)UTF8.data(), s);
     };
     RUN("dfa2", dfa2);
 
     auto dfa3 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_three((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_three((const signed char *)UTF8.data(),
+                                               s);
     };
     RUN("dfa3", dfa3);
     auto dfa4 = [&UTF8, &s]() {
-      return shiftless_validate_dfa_utf8_quad((const signed char*) UTF8.data(), s);
+      return shiftless_validate_dfa_utf8_quad((const signed char *)UTF8.data(),
+                                              s);
     };
     RUN("dfa4", dfa4);
 
@@ -236,7 +240,6 @@ public:
     RUN("lookup3avx", lookup3avx);
     RUN("basicavx", basicavx);
     RUN("rangeavx", rangeavx);
-
   }
 };
 
@@ -248,6 +251,6 @@ int main() {
   for (const size_t size : input_size) {
     Benchmark bench(size);
     bench.run();
-
   }
+  return EXIT_SUCCESS;
 }

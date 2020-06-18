@@ -6,8 +6,8 @@
 #ifndef _MSC_VER
 #include <dirent.h>
 #endif
-#include <unistd.h>
 #include <cinttypes>
+#include <unistd.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,19 +30,21 @@
 #include <libgen.h>
 #endif
 
-
 using std::string;
 using std::vector;
+using std::chrono::duration;
 using std::chrono::steady_clock;
 using std::chrono::time_point;
-using std::chrono::duration;
 
 struct event_count {
   duration<double> elapsed;
   vector<unsigned long long> event_counts;
-  event_count() : elapsed(0), event_counts{0,0,0,0,0} {}
-  event_count(const duration<double> _elapsed, const vector<unsigned long long> _event_counts) : elapsed(_elapsed), event_counts(_event_counts) {}
-  event_count(const event_count& other): elapsed(other.elapsed), event_counts(other.event_counts) { }
+  event_count() : elapsed(0), event_counts{0, 0, 0, 0, 0} {}
+  event_count(const duration<double> _elapsed,
+              const vector<unsigned long long> _event_counts)
+      : elapsed(_elapsed), event_counts(_event_counts) {}
+  event_count(const event_count &other)
+      : elapsed(other.elapsed), event_counts(other.event_counts) {}
 
   // The types of counters (so we can read the getter more easily)
   enum event_counter_types {
@@ -54,31 +56,42 @@ struct event_count {
   };
 
   double elapsed_sec() const { return duration<double>(elapsed).count(); }
-  double elapsed_ns() const { return duration<double, std::nano>(elapsed).count(); }
-  double cycles() const { return static_cast<double>(event_counts[CPU_CYCLES]); }
-  double instructions() const { return static_cast<double>(event_counts[INSTRUCTIONS]); }
-  double branch_misses() const { return static_cast<double>(event_counts[BRANCH_MISSES]); }
-  double cache_references() const { return static_cast<double>(event_counts[CACHE_REFERENCES]); }
-  double cache_misses() const { return static_cast<double>(event_counts[CACHE_MISSES]); }
+  double elapsed_ns() const {
+    return duration<double, std::nano>(elapsed).count();
+  }
+  double cycles() const {
+    return static_cast<double>(event_counts[CPU_CYCLES]);
+  }
+  double instructions() const {
+    return static_cast<double>(event_counts[INSTRUCTIONS]);
+  }
+  double branch_misses() const {
+    return static_cast<double>(event_counts[BRANCH_MISSES]);
+  }
+  double cache_references() const {
+    return static_cast<double>(event_counts[CACHE_REFERENCES]);
+  }
+  double cache_misses() const {
+    return static_cast<double>(event_counts[CACHE_MISSES]);
+  }
 
-  event_count& operator=(const event_count& other) {
+  event_count &operator=(const event_count &other) {
     this->elapsed = other.elapsed;
     this->event_counts = other.event_counts;
     return *this;
   }
-  event_count operator+(const event_count& other) const {
-    return event_count(elapsed+other.elapsed, {
-      event_counts[0]+other.event_counts[0],
-      event_counts[1]+other.event_counts[1],
-      event_counts[2]+other.event_counts[2],
-      event_counts[3]+other.event_counts[3],
-      event_counts[4]+other.event_counts[4],
-    });
+  event_count operator+(const event_count &other) const {
+    return event_count(elapsed + other.elapsed,
+                       {
+                           event_counts[0] + other.event_counts[0],
+                           event_counts[1] + other.event_counts[1],
+                           event_counts[2] + other.event_counts[2],
+                           event_counts[3] + other.event_counts[3],
+                           event_counts[4] + other.event_counts[4],
+                       });
   }
 
-  void operator+=(const event_count& other) {
-    *this = *this + other;
-  }
+  void operator+=(const event_count &other) { *this = *this + other; }
 };
 
 struct event_aggregate {
@@ -89,7 +102,7 @@ struct event_aggregate {
 
   event_aggregate() {}
 
-  void operator<<(const event_count& other) {
+  void operator<<(const event_count &other) {
     if (iterations == 0 || other.elapsed < best.elapsed) {
       best = other;
     }
@@ -105,7 +118,9 @@ struct event_aggregate {
   double cycles() const { return total.cycles() / iterations; }
   double instructions() const { return total.instructions() / iterations; }
   double branch_misses() const { return total.branch_misses() / iterations; }
-  double cache_references() const { return total.cache_references() / iterations; }
+  double cache_references() const {
+    return total.cache_references() / iterations;
+  }
   double cache_misses() const { return total.cache_misses() / iterations; }
 };
 
@@ -115,21 +130,15 @@ struct event_collector {
 
 #if defined(__linux__)
   LinuxEvents<PERF_TYPE_HARDWARE> linux_events;
-  event_collector() : linux_events(vector<int>{
-    PERF_COUNT_HW_CPU_CYCLES,
-    PERF_COUNT_HW_INSTRUCTIONS,
-    PERF_COUNT_HW_BRANCH_MISSES,
-    PERF_COUNT_HW_CACHE_REFERENCES,
-    PERF_COUNT_HW_CACHE_MISSES
-  }) {}
-  bool has_events() {
-    return linux_events.is_working();
-  }
+  event_collector()
+      : linux_events(vector<int>{
+            PERF_COUNT_HW_CPU_CYCLES, PERF_COUNT_HW_INSTRUCTIONS,
+            PERF_COUNT_HW_BRANCH_MISSES, PERF_COUNT_HW_CACHE_REFERENCES,
+            PERF_COUNT_HW_CACHE_MISSES}) {}
+  bool has_events() { return linux_events.is_working(); }
 #else
   event_collector() {}
-  bool has_events() {
-    return false;
-  }
+  bool has_events() { return false; }
 #endif
 
   inline void start() {
@@ -138,7 +147,7 @@ struct event_collector {
 #endif
     start_clock = steady_clock::now();
   }
-  inline event_count& end() {
+  inline event_count &end() {
     time_point<steady_clock> end_clock = steady_clock::now();
 #if defined(__linux)
     linux_events.end(count.event_counts);

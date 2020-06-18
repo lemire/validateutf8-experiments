@@ -1,9 +1,11 @@
-// adapted from https://fuchsia.googlesource.com/fuchsia/+/master/zircon/system/ulib/fidl/validate_string.cc#7
+// adapted from
+// https://fuchsia.googlesource.com/fuchsia/+/master/zircon/system/ulib/fidl/validate_string.cc#7
 // see the source of licensing.
-#include <cstdint>
 #include "targets.h"
+#include <cstdint>
 
-fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_t size) {
+fastvalidate::error_code fidl_validate_string(const unsigned char *data,
+                                              uint64_t size) {
   uint64_t pos = 0;
   uint64_t next_pos = 0;
   uint32_t code_point = 0;
@@ -26,8 +28,7 @@ fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_
         return fastvalidate::error_code::UTF8_ERROR;
       }
       // range check
-      code_point = (byte & 0b00011111) << 6 |
-                   (data[pos + 1] & 0b00111111);
+      code_point = (byte & 0b00011111) << 6 | (data[pos + 1] & 0b00111111);
       if (code_point < 0x80 || 0x7ff < code_point) {
         return fastvalidate::error_code::UTF8_ERROR;
       }
@@ -65,10 +66,9 @@ fastvalidate::error_code fidl_validate_string(const unsigned char* data, uint64_
         return fastvalidate::error_code::UTF8_ERROR;
       }
       // range check
-      code_point = (byte & 0b00000111) << 18 |
-                   (data[pos + 1] & 0b00111111) << 12 |
-                   (data[pos + 2] & 0b00111111) << 6 |
-                   (data[pos + 3] & 0b00111111);
+      code_point =
+          (byte & 0b00000111) << 18 | (data[pos + 1] & 0b00111111) << 12 |
+          (data[pos + 2] & 0b00111111) << 6 | (data[pos + 3] & 0b00111111);
       if (code_point < 0xffff || 0x10ffff < code_point) {
         return fastvalidate::error_code::UTF8_ERROR;
       }
