@@ -20,7 +20,6 @@ namespace active_fastvalidate = fastvalidate::arm64;
 
 #define RUNINS(name, procedure)                                                \
   {                                                                            \
-    event_collector collector;                                                 \
     event_aggregate all{};                                                     \
     for (size_t i = 0; i < repeat; i++) {                                      \
       collector.start();                                                       \
@@ -66,7 +65,7 @@ public:
   }
 
   void run(RandomUTF8 &generator) {
-
+    event_collector collector;
     for (size_t k = 0; k < samples; k++) {
       size_t size = size_t(
           double(k + 1) / double(samples) * (max_size - min_size) + min_size);
