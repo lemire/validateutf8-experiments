@@ -69,6 +69,9 @@ namespace active_fastvalidate = fastvalidate::arm64;
         double(volume);                                                        \
     double gbs =                                                               \
         double(volume) / (all1.best.elapsed_ns() - all2.best.elapsed_ns());    \
+    if (branchmissperunit < 0) {                                               \
+      branchmissperunit = 0;                                                   \
+    }                                                                          \
     if (collector.has_events()) {                                              \
       printf("     %8.3f  %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
              gbs);                                                             \
