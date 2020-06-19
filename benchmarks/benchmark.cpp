@@ -29,7 +29,6 @@ namespace active_fastvalidate = fastvalidate::arm64;
       all << allocate_count;                                                   \
     }                                                                          \
     overhead_ins = all.best.instructions();                                    \
-    overhead_branchmiss = all.best.branch_misses();                            \
     overhead_time = all.best.elapsed_ns();                                     \
   }
 
@@ -49,8 +48,7 @@ namespace active_fastvalidate = fastvalidate::arm64;
     double freq = (all.best.cycles() / all.best.elapsed_sec()) / 1000000000.0; \
     double insperunit =                                                        \
         (all.best.instructions() - overhead_ins) / double(volume);             \
-    double branchmissperunit =                                                 \
-        (all.best.branch_misses() - overhead_branchmiss) / double(volume);     \
+    double branchmissperunit = all.best.branch_misses() / double(volume);      \
     double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
     if (collector.has_events()) {                                              \
       printf("                               %8.3f ins/byte, %8.3f branch "    \
@@ -104,9 +102,9 @@ public:
 
   void run(RandomUTF8 &generator, size_t repeat) {
     double overhead_ins{};
-    double overhead_branchmiss{};
     double overhead_time{};
     OVERHEAD();
+    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n", overhead_time, overhead_ins);
     const auto UTF8 = generator.generate(size);
     size_t s{UTF8.size()};
 
@@ -207,9 +205,9 @@ public:
 
   void run(std::vector<char> &UTF8, size_t repeat) {
     double overhead_ins{};
-    double overhead_branchmiss{};
     double overhead_time{};
     OVERHEAD();
+    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n", overhead_time, overhead_ins);
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);

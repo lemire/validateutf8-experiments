@@ -17,20 +17,6 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #else
 #error "Unsupported platform"
 #endif
-#define OVERHEAD()                                                             \
-  {                                                                            \
-    event_collector collector;                                                 \
-    event_aggregate all{};                                                     \
-    for (size_t i = 0; i < repeat; i++) {                                      \
-      collector.start();                                                       \
-      event_count allocate_count = collector.end();                            \
-      all << allocate_count;                                                   \
-    }                                                                          \
-    overhead_ins = all.best.instructions();                                    \
-    overhead_branchmiss = all.best.branch_misses();                            \
-    overhead_time = all.best.elapsed_ns();                                     \
-  }
-
 #define RUNINS(name, procedure)                                                \
   {                                                                            \
     event_aggregate all{};                                                     \
@@ -43,11 +29,9 @@ namespace active_fastvalidate = fastvalidate::arm64;
       event_count allocate_count = collector.end();                            \
       all << allocate_count;                                                   \
     }                                                                          \
-    double insperunit =                                                        \
-        (all.best.instructions() - overhead_ins) / double(volume);             \
-    double branchmissperunit =                                                 \
-        (all.best.branch_misses() - overhead_branchmiss) / double(volume);     \
-    double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
+    double insperunit = all.best.instructions() / double(volume);              \
+    double branchmissperunit = all.best.branch_misses() / double(volume);      \
+    double gbs = double(volume) / all.best.elapsed_ns();                       \
     if (collector.has_events()) {                                              \
       printf("     %8.3f  %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
              gbs);                                                             \
@@ -55,7 +39,48 @@ namespace active_fastvalidate = fastvalidate::arm64;
       printf("    %8.3f ", gbs);                                               \
     }                                                                          \
   }
+
+#define RUNINSDIFF(name, procedure1, procedure2)                               \
+  {                                                                            \
+    event_aggregate all1{};                                                    \
+    event_aggregate all2{};                                                    \
+    for (size_t i = 0; i < repeat; i++) {                                      \
+      event_count allocate_count;                                              \
+      collector.start();                                                       \
+      if (procedure1() != fastvalidate::error_code::SUCCESS) {                 \
+        printf("Bug %s\n", name);                                              \
+        break;                                                                 \
+      }                                                                        \
+      allocate_count = collector.end();                                        \
+      all1 << allocate_count;                                                  \
+      collector.start();                                                       \
+      if (procedure2() != fastvalidate::error_code::SUCCESS) {                 \
+        printf("Bug %s\n", name);                                              \
+        break;                                                                 \
+      }                                                                        \
+      allocate_count = collector.end();                                        \
+      all2 << allocate_count;                                                  \
+    }                                                                          \
+    double insperunit =                                                        \
+        (all1.best.instructions() - all2.best.instructions()) /                \
+        double(volume);                                                        \
+    double branchmissperunit =                                                 \
+        (all1.best.branch_misses() - all2.best.branch_misses()) /              \
+        double(volume);                                                        \
+    double gbs =                                                               \
+        double(volume) / (all1.best.elapsed_ns() - all2.best.elapsed_ns());    \
+    if (collector.has_events()) {                                              \
+      printf("     %8.3f  %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
+             gbs);                                                             \
+    } else {                                                                   \
+      printf("    %8.3f ", gbs);                                               \
+    }                                                                          \
+  }
+
 #define RUN(name, procedure) RUNINS(name, procedure)
+
+#define RUNDIFF(name, procedure1, procedure2)                                  \
+  RUNINSDIFF(name, procedure1, procedure2)
 
 std::vector<uint8_t> buffer;
 
@@ -84,34 +109,53 @@ public:
     for (size_t k = 0; k < samples; k++) {
       size_t size = size_t(
           double(k) / double(samples - 1) * (max_size - min_size) + min_size);
-      const auto UTF8 = generator.generate(size);
-      size_t s{UTF8.size()};
-      size_t volume{s};
-      double overhead_ins{};
-      double overhead_branchmiss{};
-      double overhead_time{};
-      OVERHEAD();
-      buffer.resize(s);
-      printf("%zu     ", s);
-      auto mem = [&UTF8, &s]() {
-        memcpy(buffer.data(), UTF8.data(), s);
+      const auto UTF8 = generator.generate(2 * size);
+      size_t s1{UTF8.size()};
+      size_t volume{size};
+      size_t s2{UTF8.size() - volume};
+      while (int8_t(UTF8[s2]) < 64) {
+        s2 -= 1;
+      }
+      volume = s1 - s2;
+      buffer.resize(s1);
+      printf("%zu     ", volume);
+      auto mem1 = [&UTF8, &s1]() {
+        memcpy(buffer.data(), UTF8.data(), s1);
         return fastvalidate::error_code::SUCCESS;
       };
-      RUN("memcpy", mem);
+      auto mem2 = [&UTF8, &s2]() {
+        memcpy(buffer.data(), UTF8.data(), s2);
+        return fastvalidate::error_code::SUCCESS;
+      };
+      RUNDIFF("memcpy", mem1, mem2);
 
-      auto fushia = [&UTF8, &s]() {
-        return fidl_validate_string(UTF8.data(), s);
+      auto fushia1 = [&UTF8, &s1]() {
+        return fidl_validate_string(UTF8.data(), s1);
       };
-      RUN("fushia", fushia);
-      auto dfa3 = [&UTF8, &s]() {
+      auto fushia2 = [&UTF8, &s2]() {
+        return fidl_validate_string(UTF8.data(), s2);
+      };
+
+      RUNDIFF("fushia", fushia1, fushia2);
+      auto dfa31 = [&UTF8, &s1]() {
         return shiftless_validate_dfa_utf8_three(
-            (const signed char *)UTF8.data(), s);
+            (const signed char *)UTF8.data(), s1);
       };
-      RUN("dfa3", dfa3);
-      auto lookup3avx = [&UTF8, &s]() {
-        return active_fastvalidate::lookup3::validate(UTF8.data(), s);
+      auto dfa32 = [&UTF8, &s2]() {
+        return shiftless_validate_dfa_utf8_three(
+            (const signed char *)UTF8.data(), s2);
       };
-      RUN("lookup3avx", lookup3avx);
+      RUNDIFF("dfa3", dfa31, dfa32);
+
+      auto lookup3avx1 = [&UTF8, &s1]() {
+        return active_fastvalidate::lookup3::validate(UTF8.data(), s1);
+      };
+      auto lookup3avx2 = [&UTF8, &s2]() {
+        return active_fastvalidate::lookup3::validate(UTF8.data(), s2);
+      };
+
+      RUNDIFF("lookup3avx", lookup3avx1, lookup3avx2);
+
       printf("\n");
     }
   }
