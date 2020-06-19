@@ -49,14 +49,17 @@ namespace active_fastvalidate = fastvalidate::arm64;
     double insperunit =                                                        \
         (all.best.instructions() - overhead_ins) / double(volume);             \
     double branchmissperunit = all.best.branch_misses() / double(volume);      \
+    double means = all.total.elapsed_ns() / repeat;                            \
+    double margin = (means - all.best.elapsed_ns()) / means;                   \
     double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
     if (collector.has_events()) {                                              \
       printf("                               %8.3f ins/byte, %8.3f branch "    \
              "miss/kbyte,   %8.3f GHz, "                                       \
-             "%8.3f GB/s \n",                                                  \
-             insperunit, branchmissperunit * 1000, freq, gbs);                 \
+             "%8.3f GB/s (%5.2f %%) \n",                                       \
+             insperunit, branchmissperunit * 1000, freq, gbs, margin);         \
     } else {                                                                   \
-      printf("                               %8.3f GB/s \n", gbs);             \
+      printf("                               %8.3f GB/s  (%5.2f %%)\n", gbs,   \
+             margin * 100);                                                    \
     }                                                                          \
   }
 #define RUN(name, procedure)                                                   \
@@ -77,7 +80,7 @@ public:
     printf("\n");
     printf("Running UTF8 validation benchmark.\n");
     printf("The speed is normalized by the number of input bytes.\n");
-    const size_t repeat = 10;
+    const size_t repeat = 1000;
     RandomUTF8 gen_1byte(rd, 1, 0, 0, 0);
     RandomUTF8 gen_2bytes(rd, 0, 1, 0, 0);
     RandomUTF8 gen_1_2(rd, 1, 1, 0, 0);
@@ -104,7 +107,8 @@ public:
     double overhead_ins{};
     double overhead_time{};
     OVERHEAD();
-    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n", overhead_time, overhead_ins);
+    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n",
+           overhead_time, overhead_ins);
     const auto UTF8 = generator.generate(size);
     size_t s{UTF8.size()};
 
@@ -187,7 +191,7 @@ public:
     printf("\n");
     printf("Running UTF8 validation benchmark.\n");
     printf("The speed is normalized by the number of input bytes.\n");
-    const size_t repeat = 10;
+    const size_t repeat = 1000;
     for (std::string filename : filenames) {
       std::ifstream in(filename);
       if (!in) {
@@ -207,7 +211,8 @@ public:
     double overhead_ins{};
     double overhead_time{};
     OVERHEAD();
-    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n", overhead_time, overhead_ins);
+    printf("Overhead ==> nanoseconds : %.3f, instructions %.3f\n",
+           overhead_time, overhead_ins);
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);
