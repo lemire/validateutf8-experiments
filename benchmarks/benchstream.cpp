@@ -17,6 +17,19 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #else
 #error "Unsupported platform"
 #endif
+#define OVERHEAD()                                                             \
+  {                                                                            \
+    event_collector collector;                                                 \
+    event_aggregate all{};                                                     \
+    for (size_t i = 0; i < repeat; i++) {                                      \
+      collector.start();                                                       \
+      event_count allocate_count = collector.end();                            \
+      all << allocate_count;                                                   \
+    }                                                                          \
+    overhead_ins = all.best.instructions();                                    \
+    overhead_branchmiss = all.best.branch_misses();                            \
+    overhead_time = all.best.elapsed_ns();                                     \
+  }
 
 #define RUNINS(name, procedure)                                                \
   {                                                                            \
@@ -30,9 +43,11 @@ namespace active_fastvalidate = fastvalidate::arm64;
       event_count allocate_count = collector.end();                            \
       all << allocate_count;                                                   \
     }                                                                          \
-    double insperunit = all.best.instructions() / double(volume);              \
-    double branchmissperunit = all.best.branch_misses() / double(volume);      \
-    double gbs = double(volume) / all.best.elapsed_ns();                       \
+    double insperunit =                                                        \
+        (all.best.instructions() - overhead_ins) / double(volume);             \
+    double branchmissperunit =                                                 \
+        (all.best.branch_misses() - overhead_branchmiss) / double(volume);     \
+    double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
     if (collector.has_events()) {                                              \
       printf("     %8.3f  %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
              gbs);                                                             \
@@ -72,6 +87,10 @@ public:
       const auto UTF8 = generator.generate(size);
       size_t s{UTF8.size()};
       size_t volume{s};
+      double overhead_ins{};
+      double overhead_branchmiss{};
+      double overhead_time{};
+      OVERHEAD();
       buffer.resize(s);
       printf("%zu     ", s);
       auto mem = [&UTF8, &s]() {

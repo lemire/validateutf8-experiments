@@ -156,7 +156,8 @@ void test() {
   const char *goodsequences[] = {"a", "\xc3\xb1", "\xe2\x82\xa1", "\xf0\x90\x8c\xbc", "안녕하세요, 세상",
                             "\xc2\x80", // 6.7.2
                             "\xf0\x90\x80\x80", // 6.7.4
-                            "\xee\x80\x80" // 6.11.2
+                            "\xee\x80\x80", // 6.11.2
+                            "\xef\xbb\xbf"
                             };
   const char *badsequences[] = {"\xc3\x28",         // 0
                           "\xa0\xa1",         // 1
@@ -185,7 +186,7 @@ void test() {
                           "\x91\x85\x95\x9e",
                           "\x6c\x02\x8e\x18"
                         };
-  for (size_t i = 0; i < 8; i++) {
+  for (size_t i = 0; i < 9; i++) {
     size_t len = strlen(goodsequences[i]);
     if(active_fastvalidate::lookup2::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
         printf("bug goodsequences[%zu]\n", i);

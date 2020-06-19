@@ -19,6 +19,20 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #error "Unsupported platform"
 #endif
 
+#define OVERHEAD()                                                             \
+  {                                                                            \
+    event_collector collector;                                                 \
+    event_aggregate all{};                                                     \
+    for (size_t i = 0; i < repeat; i++) {                                      \
+      collector.start();                                                       \
+      event_count allocate_count = collector.end();                            \
+      all << allocate_count;                                                   \
+    }                                                                          \
+    overhead_ins = all.best.instructions();                                    \
+    overhead_branchmiss = all.best.branch_misses();                            \
+    overhead_time = all.best.elapsed_ns();                                     \
+  }
+
 #define RUNINS(name, procedure)                                                \
   {                                                                            \
     event_collector collector;                                                 \
@@ -33,9 +47,11 @@ namespace active_fastvalidate = fastvalidate::arm64;
       all << allocate_count;                                                   \
     }                                                                          \
     double freq = (all.best.cycles() / all.best.elapsed_sec()) / 1000000000.0; \
-    double insperunit = all.best.instructions() / double(volume);              \
-    double branchmissperunit = all.best.branch_misses() / double(volume);      \
-    double gbs = double(volume) / all.best.elapsed_ns();                       \
+    double insperunit =                                                        \
+        (all.best.instructions() - overhead_ins) / double(volume);             \
+    double branchmissperunit =                                                 \
+        (all.best.branch_misses() - overhead_branchmiss) / double(volume);     \
+    double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
     if (collector.has_events()) {                                              \
       printf("                               %8.3f ins/byte, %8.3f branch "    \
              "miss/kbyte,   %8.3f GHz, "                                       \
@@ -87,7 +103,10 @@ public:
   }
 
   void run(RandomUTF8 &generator, size_t repeat) {
-
+    double overhead_ins{};
+    double overhead_branchmiss{};
+    double overhead_time{};
+    OVERHEAD();
     const auto UTF8 = generator.generate(size);
     size_t s{UTF8.size()};
 
@@ -106,10 +125,12 @@ public:
     RUN("fushia", fushia);
 
     auto utf8lib = [&UTF8, &s]() {
-      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s) ? fastvalidate::error_code::SUCCESS : fastvalidate::error_code::UTF8_ERROR;
+      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
+                 ? fastvalidate::error_code::SUCCESS
+                 : fastvalidate::error_code::UTF8_ERROR;
     };
     RUN("utf8lib", utf8lib);
-  
+
     auto dfa = [&UTF8, &s]() {
       return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
@@ -185,7 +206,10 @@ public:
   }
 
   void run(std::vector<char> &UTF8, size_t repeat) {
-
+    double overhead_ins{};
+    double overhead_branchmiss{};
+    double overhead_time{};
+    OVERHEAD();
     size_t s{UTF8.size()};
 
     size_t volume = UTF8.size() * sizeof(UTF8[0]);
@@ -204,7 +228,9 @@ public:
     RUN("fushia", fushia);
 
     auto utf8lib = [&UTF8, &s]() {
-      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s) ? fastvalidate::error_code::SUCCESS : fastvalidate::error_code::UTF8_ERROR;
+      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
+                 ? fastvalidate::error_code::SUCCESS
+                 : fastvalidate::error_code::UTF8_ERROR;
     };
     RUN("utf8lib", utf8lib);
 
