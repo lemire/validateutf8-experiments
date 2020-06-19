@@ -2,6 +2,7 @@
 #include "fushia.h"
 #include "hoehrmann.h"
 #include "random_utf8.h"
+#include "utf8.h"
 #include <cstdlib>
 #include <fstream>
 #include <streambuf>
@@ -104,6 +105,11 @@ public:
     };
     RUN("fushia", fushia);
 
+    auto utf8lib = [&UTF8, &s]() {
+      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s) ? fastvalidate::error_code::SUCCESS : fastvalidate::error_code::UTF8_ERROR;
+    };
+    RUN("utf8lib", utf8lib);
+  
     auto dfa = [&UTF8, &s]() {
       return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
@@ -196,6 +202,11 @@ public:
       return fidl_validate_string((const unsigned char *)UTF8.data(), s);
     };
     RUN("fushia", fushia);
+
+    auto utf8lib = [&UTF8, &s]() {
+      return utf8::is_valid(UTF8.begin(), UTF8.begin() + s) ? fastvalidate::error_code::SUCCESS : fastvalidate::error_code::UTF8_ERROR;
+    };
+    RUN("utf8lib", utf8lib);
 
     auto dfa = [&UTF8, &s]() {
       return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);

@@ -13,7 +13,7 @@ random_utf8.o: benchmarks/random_utf8.h  benchmarks/random_utf8.cpp
 	c++  $(CPPFLAGS) -c benchmarks/random_utf8.cpp -Ibenchmarks
 
 benchmark: tests/unit.cpp $(ALLFILES) $(BENCHMARKFILES)  random_utf8.o
-	c++  $(CPPFLAGS) -o benchmark benchmarks/benchmark.cpp -Ibenchmarks -Isrc random_utf8.o
+	c++  $(CPPFLAGS) -o benchmark benchmarks/benchmark.cpp -Ibenchmarks -Isrc random_utf8.o -Idependencies/utf8_v2_3_4/source
 
 benchstream: benchmarks/benchstream.cpp $(ALLFILES) $(BENCHMARKFILES)  random_utf8.o
 	c++  $(CPPFLAGS) -o benchstream benchmarks/benchstream.cpp -Ibenchmarks -Isrc random_utf8.o
