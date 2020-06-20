@@ -131,6 +131,17 @@ public:
     };
     RUN("fushia_ascii", fushia_ascii);
 
+    auto fushia_ascii2 = [&UTF8, &s]() {
+      return fidl_validate_string_ascii2(UTF8.data(), s);
+    };
+    RUN("fushia_ascii2", fushia_ascii2);
+    auto fushia_ascii4 = [&UTF8, &s]() {
+      return fidl_validate_string_ascii4(UTF8.data(), s);
+    };
+    RUN("fushia_ascii4", fushia_ascii4);
+
+
+
     auto utf8lib = [&UTF8, &s]() {
       return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
                  ? fastvalidate::error_code::SUCCESS
@@ -239,6 +250,17 @@ public:
       return fidl_validate_string_ascii((const unsigned char *)UTF8.data(), s);
     };
     RUN("fushia_ascii", fushia_ascii);
+
+    auto fushia_ascii2 = [&UTF8, &s]() {
+      return fidl_validate_string_ascii2((const unsigned char *)UTF8.data(), s);
+    };
+    RUN("fushia_ascii2", fushia_ascii2);
+
+    auto fushia_ascii4 = [&UTF8, &s]() {
+      return fidl_validate_string_ascii4((const unsigned char *)UTF8.data(), s);
+    };
+    RUN("fushia_ascii4", fushia_ascii4);
+
 
     auto utf8lib = [&UTF8, &s]() {
       return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
