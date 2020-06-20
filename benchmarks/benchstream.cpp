@@ -159,6 +159,15 @@ public:
 
       RUNDIFF("lookup3avx", lookup3avx1, lookup3avx2);
 
+      auto fushia1_ascii = [&UTF8, &s1]() {
+        return fidl_validate_string_ascii(UTF8.data(), s1);
+      };
+      auto fushia2_ascii = [&UTF8, &s2]() {
+        return fidl_validate_string_ascii(UTF8.data(), s2);
+      };
+
+      RUNDIFF("fushia_ascii", fushia1_ascii, fushia2_ascii);
+
       printf("\n");
     }
   }
@@ -175,11 +184,11 @@ int main(int argc, char **argv) {
   event_collector collector;
   if (collector.has_events()) {
     printf(
-        "# columns match size in bytes then (ins/byte, branch miss /kb, GB/s)");
+        "# columns match size in bytes then (ins/byte, branch miss /KB, GB/s)");
   } else {
     printf("# columns match size in bytes then (GB/s)");
   }
-  printf("# the validators are memcpy, branchy, dfa, lookup3\n");
+  printf("# the validators are memcpy, branchy, dfa, lookup3, branchy/ascii\n");
 
   size_t repeat = atoll(argv[1]);
   printf("# number of repetitions %zu \n", repeat);

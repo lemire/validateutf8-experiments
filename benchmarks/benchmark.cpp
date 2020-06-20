@@ -126,6 +126,11 @@ public:
     };
     RUN("fushia", fushia);
 
+    auto fushia_ascii = [&UTF8, &s]() {
+      return fidl_validate_string_ascii(UTF8.data(), s);
+    };
+    RUN("fushia_ascii", fushia_ascii);
+
     auto utf8lib = [&UTF8, &s]() {
       return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
                  ? fastvalidate::error_code::SUCCESS
@@ -229,6 +234,11 @@ public:
       return fidl_validate_string((const unsigned char *)UTF8.data(), s);
     };
     RUN("fushia", fushia);
+
+    auto fushia_ascii = [&UTF8, &s]() {
+      return fidl_validate_string_ascii((const unsigned char *)UTF8.data(), s);
+    };
+    RUN("fushia_ascii", fushia_ascii);
 
     auto utf8lib = [&UTF8, &s]() {
       return utf8::is_valid(UTF8.begin(), UTF8.begin() + s)
