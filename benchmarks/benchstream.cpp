@@ -33,7 +33,7 @@ namespace active_fastvalidate = fastvalidate::arm64;
     double branchmissperunit = all.best.branch_misses() / double(volume);      \
     double gbs = double(volume) / all.best.elapsed_ns();                       \
     if (collector.has_events()) {                                              \
-      printf("     %8.3f  %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
+      printf("     %8.3f  %8.3f %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
              gbs);                                                             \
     } else {                                                                   \
       printf("    %8.3f ", gbs);                                               \
@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
   event_collector collector;
   if (collector.has_events()) {
     printf(
-        "# columns match size in bytes then (ins/byte, branch miss /KB, GB/s)");
+        "# columns match size in bytes then (ins/byte, branch miss /KB, GB/s, ins/cycle)");
   } else {
     printf("# columns match size in bytes then (GB/s)");
   }
