@@ -3,89 +3,95 @@ Running UTF8 validation benchmark.
 The speed is normalized by the number of input bytes.
 file: examples/hongkong.html (1807KB)
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.102 ins/byte,    0.002 branch miss/kbyte,      3.399 GHz,   48.177 GB/s ( 0.02 %) 
-                                  fushia                                   6.669 ins/byte,    7.465 branch miss/kbyte,      3.390 GHz,    1.346 GB/s ( 0.13 %) 
-                                 utf8lib                                  22.889 ins/byte,    8.496 branch miss/kbyte,      3.390 GHz,    0.379 GB/s ( 0.00 %) 
-                                     dfa                                   9.000 ins/byte,    0.003 branch miss/kbyte,      3.389 GHz,    0.668 GB/s ( 0.01 %) 
-                                    dfa2                                   8.000 ins/byte,    0.003 branch miss/kbyte,      3.390 GHz,    1.337 GB/s ( 0.01 %) 
-                                    dfa3                                   7.000 ins/byte,    0.003 branch miss/kbyte,      3.389 GHz,    1.691 GB/s ( 0.01 %) 
-                                    dfa4                                   9.000 ins/byte,    0.005 branch miss/kbyte,      3.389 GHz,    0.565 GB/s ( 0.00 %) 
-                              zwegneravx                                   0.423 ins/byte,    3.706 branch miss/kbyte,      3.396 GHz,   13.943 GB/s ( 0.02 %) 
-                              lookup2avx                                   0.421 ins/byte,    2.027 branch miss/kbyte,      3.396 GHz,   17.138 GB/s ( 0.03 %) 
-                              lookup3avx                                   0.425 ins/byte,    1.975 branch miss/kbyte,      3.396 GHz,   17.441 GB/s ( 0.03 %) 
-                                basicavx                                   0.590 ins/byte,    1.990 branch miss/kbyte,      3.396 GHz,   13.418 GB/s ( 0.02 %) 
-                                rangeavx                                   0.521 ins/byte,    2.035 branch miss/kbyte,      3.396 GHz,   14.566 GB/s ( 0.03 %) 
+                                  memcpy                                   0.102 ins/byte,    0.002 branch miss/kbyte,      3.400 GHz,   47.655 GB/s ( 0.04 %)    1.425 ins/byte 
+                                  fushia                                   6.669 ins/byte,    7.513 branch miss/kbyte,      3.376 GHz,    1.373 GB/s ( 0.14 %)    2.711 ins/byte 
+                            fushia_ascii                                   2.639 ins/byte,    8.387 branch miss/kbyte,      3.394 GHz,    4.602 GB/s ( 0.02 %)    3.577 ins/byte 
+                                 utf8lib                                  22.889 ins/byte,    8.475 branch miss/kbyte,      3.389 GHz,    0.421 GB/s ( 0.00 %)    2.844 ins/byte 
+                                     dfa                                   9.000 ins/byte,    0.004 branch miss/kbyte,      3.387 GHz,    0.665 GB/s ( 0.01 %)    1.768 ins/byte 
+                                    dfa2                                   8.000 ins/byte,    0.003 branch miss/kbyte,      3.390 GHz,    1.344 GB/s ( 0.02 %)    3.173 ins/byte 
+                                    dfa3                                   7.000 ins/byte,    0.003 branch miss/kbyte,      3.389 GHz,    1.690 GB/s ( 0.01 %)    3.491 ins/byte 
+                                    dfa4                                   9.000 ins/byte,    0.005 branch miss/kbyte,      3.389 GHz,    0.565 GB/s ( 0.00 %)    1.500 ins/byte 
+                              zwegneravx                                   0.423 ins/byte,    3.665 branch miss/kbyte,      3.396 GHz,   14.048 GB/s ( 0.03 %)    1.751 ins/byte 
+                              lookup2avx                                   0.421 ins/byte,    2.091 branch miss/kbyte,      3.397 GHz,   16.957 GB/s ( 0.02 %)    2.102 ins/byte 
+                              lookup3avx                                   0.425 ins/byte,    1.969 branch miss/kbyte,      3.397 GHz,   17.495 GB/s ( 0.03 %)    2.191 ins/byte 
+                                basicavx                                   0.590 ins/byte,    2.013 branch miss/kbyte,      3.396 GHz,   13.432 GB/s ( 0.02 %)    2.335 ins/byte 
+                                rangeavx                                   0.521 ins/byte,    2.020 branch miss/kbyte,      3.396 GHz,   14.616 GB/s ( 0.03 %)    2.244 ins/byte 
 file: examples/twitter.json (631KB)
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.102 ins/byte,    0.006 branch miss/kbyte,      3.407 GHz,   41.525 GB/s ( 0.02 %) 
-                                  fushia                                   7.208 ins/byte,    3.800 branch miss/kbyte,      3.394 GHz,    1.516 GB/s ( 0.15 %) 
-                                 utf8lib                                  22.799 ins/byte,    5.094 branch miss/kbyte,      3.388 GHz,    0.394 GB/s ( 0.01 %) 
-                                     dfa                                   9.000 ins/byte,    0.008 branch miss/kbyte,      3.389 GHz,    0.664 GB/s ( 0.02 %) 
-                                    dfa2                                   8.000 ins/byte,    0.006 branch miss/kbyte,      3.394 GHz,    1.339 GB/s ( 0.02 %) 
-                                    dfa3                                   7.000 ins/byte,    0.006 branch miss/kbyte,      3.394 GHz,    1.693 GB/s ( 0.01 %) 
-                                    dfa4                                   9.000 ins/byte,    0.011 branch miss/kbyte,      3.390 GHz,    0.565 GB/s ( 0.00 %) 
-                              zwegneravx                                   0.444 ins/byte,    0.367 branch miss/kbyte,      3.405 GHz,   24.806 GB/s ( 0.02 %) 
-                              lookup2avx                                   0.408 ins/byte,    0.321 branch miss/kbyte,      3.407 GHz,   28.203 GB/s ( 0.07 %) 
-                              lookup3avx                                   0.413 ins/byte,    0.320 branch miss/kbyte,      3.407 GHz,   28.652 GB/s ( 0.05 %) 
-                                basicavx                                   0.570 ins/byte,    0.415 branch miss/kbyte,      3.400 GHz,   18.632 GB/s ( 0.02 %) 
-                                rangeavx                                   0.505 ins/byte,    0.301 branch miss/kbyte,      3.404 GHz,   22.305 GB/s ( 0.05 %) 
+                                  memcpy                                   0.102 ins/byte,    0.006 branch miss/kbyte,      3.413 GHz,   41.468 GB/s ( 0.04 %)    1.237 ins/byte 
+                                  fushia                                   7.208 ins/byte,    3.919 branch miss/kbyte,      3.341 GHz,    1.502 GB/s ( 0.22 %)    3.239 ins/byte 
+                            fushia_ascii                                   3.576 ins/byte,    3.849 branch miss/kbyte,      3.396 GHz,    4.363 GB/s ( 0.05 %)    4.595 ins/byte 
+                                 utf8lib                                  22.799 ins/byte,    5.081 branch miss/kbyte,      3.391 GHz,    0.437 GB/s ( 0.00 %)    2.938 ins/byte 
+                                     dfa                                   9.000 ins/byte,    0.008 branch miss/kbyte,      3.389 GHz,    0.664 GB/s ( 0.02 %)    1.764 ins/byte 
+                                    dfa2                                   8.000 ins/byte,    0.008 branch miss/kbyte,      3.382 GHz,    1.338 GB/s ( 0.02 %)    3.165 ins/byte 
+                                    dfa3                                   7.000 ins/byte,    0.008 branch miss/kbyte,      3.394 GHz,    1.693 GB/s ( 0.01 %)    3.492 ins/byte 
+                                    dfa4                                   9.000 ins/byte,    0.011 branch miss/kbyte,      3.390 GHz,    0.565 GB/s ( 0.01 %)    1.500 ins/byte 
+                              zwegneravx                                   0.444 ins/byte,    0.442 branch miss/kbyte,      3.407 GHz,   24.254 GB/s ( 0.01 %)    3.160 ins/byte 
+                              lookup2avx                                   0.408 ins/byte,    0.383 branch miss/kbyte,      3.406 GHz,   27.382 GB/s ( 0.04 %)    3.282 ins/byte 
+                              lookup3avx                                   0.413 ins/byte,    0.309 branch miss/kbyte,      3.409 GHz,   28.981 GB/s ( 0.09 %)    3.511 ins/byte 
+                                basicavx                                   0.570 ins/byte,    0.356 branch miss/kbyte,      3.404 GHz,   19.049 GB/s ( 0.03 %)    3.189 ins/byte 
+                                rangeavx                                   0.505 ins/byte,    0.271 branch miss/kbyte,      3.403 GHz,   22.376 GB/s ( 0.08 %)    3.318 ins/byte 
 
 Running UTF8 validation benchmark.
 The speed is normalized by the number of input bytes.
 Input size: (UTF8) 16384
 - ASCII characters
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.227 GHz,   54.435 GB/s ( 0.07 %) 
-                                  fushia                                   6.000 ins/byte,    0.244 branch miss/kbyte,      3.421 GHz,    1.697 GB/s ( 0.02 %) 
-                                 utf8lib                                  23.000 ins/byte,    0.244 branch miss/kbyte,      3.401 GHz,    0.424 GB/s ( 0.05 %) 
-                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.404 GHz,    0.653 GB/s ( 0.02 %) 
-                                    dfa2                                   7.501 ins/byte,    0.244 branch miss/kbyte,      3.411 GHz,    1.302 GB/s ( 0.02 %) 
-                                    dfa3                                   7.003 ins/byte,    0.244 branch miss/kbyte,      3.420 GHz,    1.801 GB/s ( 0.02 %) 
-                                    dfa4                                   9.003 ins/byte,    0.366 branch miss/kbyte,      3.403 GHz,    0.653 GB/s ( 0.02 %) 
-                              zwegneravx                                   0.256 ins/byte,    0.244 branch miss/kbyte,      4.118 GHz,   52.855 GB/s ( 0.04 %) 
-                              lookup2avx                                   0.192 ins/byte,    0.244 branch miss/kbyte,      4.540 GHz,   71.239 GB/s ( 0.05 %) 
-                              lookup3avx                                   0.208 ins/byte,    0.244 branch miss/kbyte,      4.431 GHz,   68.271 GB/s ( 0.04 %) 
-                                basicavx                                   0.224 ins/byte,    0.183 branch miss/kbyte,      4.169 GHz,   68.271 GB/s ( 0.05 %) 
-                                rangeavx                                   0.224 ins/byte,    0.244 branch miss/kbyte,      4.358 GHz,   68.271 GB/s ( 0.03 %) 
+                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.103 GHz,   52.855 GB/s ( 0.05 %)    1.413 ins/byte 
+                                  fushia                                   6.000 ins/byte,    0.244 branch miss/kbyte,      3.419 GHz,    1.697 GB/s ( 0.01 %)    2.978 ins/byte 
+                            fushia_ascii                                   1.251 ins/byte,    0.244 branch miss/kbyte,      3.618 GHz,   13.519 GB/s ( 0.01 %)    4.648 ins/byte 
+                                 utf8lib                                  23.000 ins/byte,    0.244 branch miss/kbyte,      3.400 GHz,    0.377 GB/s ( 0.01 %)    2.551 ins/byte 
+                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.403 GHz,    0.652 GB/s ( 0.01 %)    1.727 ins/byte 
+                                    dfa2                                   8.002 ins/byte,    0.244 branch miss/kbyte,      3.414 GHz,    1.348 GB/s ( 0.02 %)    3.160 ins/byte 
+                                    dfa3                                   7.003 ins/byte,    0.244 branch miss/kbyte,      3.418 GHz,    1.691 GB/s ( 0.01 %)    3.464 ins/byte 
+                                    dfa4                                  10.003 ins/byte,    0.366 branch miss/kbyte,      3.402 GHz,    0.566 GB/s ( 0.01 %)    1.665 ins/byte 
+                              zwegneravx                                   0.256 ins/byte,    0.244 branch miss/kbyte,      4.148 GHz,   52.855 GB/s ( 0.03 %)    3.232 ins/byte 
+                              lookup2avx                                   0.192 ins/byte,    0.244 branch miss/kbyte,      4.300 GHz,   68.271 GB/s ( 0.02 %)    3.014 ins/byte 
+                              lookup3avx                                   0.208 ins/byte,    0.244 branch miss/kbyte,      4.312 GHz,   68.271 GB/s ( 0.04 %)    3.245 ins/byte 
+                                basicavx                                   0.224 ins/byte,    0.244 branch miss/kbyte,      4.342 GHz,   68.271 GB/s ( 0.05 %)    3.453 ins/byte 
+                                rangeavx                                   0.223 ins/byte,    0.183 branch miss/kbyte,      4.222 GHz,   65.540 GB/s ( 0.02 %)    3.403 ins/byte 
 - 1 or 2 UTF8 bytes
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.158 GHz,   52.858 GB/s ( 0.05 %) 
-                                  fushia                                  10.660 ins/byte,  194.617 branch miss/kbyte,      3.400 GHz,    0.415 GB/s ( 0.04 %) 
-                                 utf8lib                                  23.000 ins/byte,  283.657 branch miss/kbyte,      3.397 GHz,    0.235 GB/s ( 0.03 %) 
-                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.404 GHz,    0.652 GB/s ( 0.01 %) 
-                                    dfa2                                   7.501 ins/byte,    0.244 branch miss/kbyte,      3.410 GHz,    1.299 GB/s ( 0.03 %) 
-                                    dfa3                                   7.002 ins/byte,    0.244 branch miss/kbyte,      3.421 GHz,    1.803 GB/s ( 0.02 %) 
-                                    dfa4                                   9.003 ins/byte,    0.366 branch miss/kbyte,      3.405 GHz,    0.653 GB/s ( 0.01 %) 
-                              zwegneravx                                   1.259 ins/byte,    0.244 branch miss/kbyte,      3.530 GHz,    9.347 GB/s ( 0.01 %) 
-                              lookup2avx                                   1.149 ins/byte,    0.244 branch miss/kbyte,      3.583 GHz,   11.857 GB/s ( 0.01 %) 
-                              lookup3avx                                   1.118 ins/byte,    0.244 branch miss/kbyte,      3.598 GHz,   12.395 GB/s ( 0.01 %) 
-                                basicavx                                   1.745 ins/byte,    0.183 branch miss/kbyte,      3.472 GHz,    6.439 GB/s ( 0.03 %) 
-                                rangeavx                                   1.462 ins/byte,    0.244 branch miss/kbyte,      3.509 GHz,    7.715 GB/s ( 0.01 %) 
+                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.121 GHz,   52.855 GB/s ( 0.05 %)    1.407 ins/byte 
+                                  fushia                                  10.689 ins/byte,  200.915 branch miss/kbyte,      3.399 GHz,    0.410 GB/s ( 0.04 %)    1.290 ins/byte 
+                            fushia_ascii                                  14.941 ins/byte,  306.866 branch miss/kbyte,      3.398 GHz,    0.328 GB/s ( 0.03 %)    1.443 ins/byte 
+                                 utf8lib                                  23.000 ins/byte,  293.195 branch miss/kbyte,      3.397 GHz,    0.221 GB/s ( 0.01 %)    1.494 ins/byte 
+                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.403 GHz,    0.652 GB/s ( 0.02 %)    1.727 ins/byte 
+                                    dfa2                                   8.002 ins/byte,    0.244 branch miss/kbyte,      3.411 GHz,    1.347 GB/s ( 0.04 %)    3.160 ins/byte 
+                                    dfa3                                   7.003 ins/byte,    0.244 branch miss/kbyte,      3.419 GHz,    1.691 GB/s ( 0.02 %)    3.464 ins/byte 
+                                    dfa4                                  10.003 ins/byte,    0.366 branch miss/kbyte,      3.403 GHz,    0.566 GB/s ( 0.00 %)    1.665 ins/byte 
+                              zwegneravx                                   1.256 ins/byte,    0.244 branch miss/kbyte,      3.541 GHz,    9.400 GB/s ( 0.01 %)    3.334 ins/byte 
+                              lookup2avx                                   1.145 ins/byte,    0.244 branch miss/kbyte,      3.557 GHz,   11.856 GB/s ( 0.01 %)    3.807 ins/byte 
+                              lookup3avx                                   1.115 ins/byte,    0.244 branch miss/kbyte,      3.612 GHz,   12.489 GB/s ( 0.02 %)    3.842 ins/byte 
+                                basicavx                                   1.740 ins/byte,    0.244 branch miss/kbyte,      3.499 GHz,    6.441 GB/s ( 0.02 %)    3.203 ins/byte 
+                                rangeavx                                   1.457 ins/byte,    0.183 branch miss/kbyte,      3.494 GHz,    7.788 GB/s ( 0.01 %)    3.248 ins/byte 
 - 1, 2, 3 UTF8 bytes
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.143 GHz,   54.442 GB/s ( 0.07 %) 
-                                  fushia                                  12.320 ins/byte,  215.354 branch miss/kbyte,      3.399 GHz,    0.394 GB/s ( 0.02 %) 
-                                 utf8lib                                  22.330 ins/byte,  276.683 branch miss/kbyte,      3.397 GHz,    0.258 GB/s ( 0.01 %) 
-                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.404 GHz,    0.652 GB/s ( 0.01 %) 
-                                    dfa2                                   7.501 ins/byte,    0.244 branch miss/kbyte,      3.414 GHz,    1.299 GB/s ( 0.02 %) 
-                                    dfa3                                   7.003 ins/byte,    0.244 branch miss/kbyte,      3.420 GHz,    1.803 GB/s ( 0.01 %) 
-                                    dfa4                                   9.003 ins/byte,    0.366 branch miss/kbyte,      3.404 GHz,    0.653 GB/s ( 0.01 %) 
-                              zwegneravx                                   1.258 ins/byte,    0.244 branch miss/kbyte,      3.541 GHz,    9.348 GB/s ( 0.00 %) 
-                              lookup2avx                                   1.149 ins/byte,    0.244 branch miss/kbyte,      3.576 GHz,   11.857 GB/s ( 0.01 %) 
-                              lookup3avx                                   1.118 ins/byte,    0.244 branch miss/kbyte,      3.583 GHz,   12.490 GB/s ( 0.02 %) 
-                                basicavx                                   1.745 ins/byte,    0.183 branch miss/kbyte,      3.472 GHz,    6.441 GB/s ( 0.01 %) 
-                                rangeavx                                   1.462 ins/byte,    0.244 branch miss/kbyte,      3.500 GHz,    7.752 GB/s ( 0.03 %) 
+                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.203 GHz,   54.620 GB/s ( 0.08 %)    1.422 ins/byte 
+                                  fushia                                  12.346 ins/byte,  213.658 branch miss/kbyte,      3.399 GHz,    0.398 GB/s ( 0.03 %)    1.446 ins/byte 
+                            fushia_ascii                                  15.509 ins/byte,  209.020 branch miss/kbyte,      3.399 GHz,    0.400 GB/s ( 0.04 %)    1.827 ins/byte 
+                                 utf8lib                                  22.335 ins/byte,  264.372 branch miss/kbyte,      3.398 GHz,    0.253 GB/s ( 0.03 %)    1.662 ins/byte 
+                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.404 GHz,    0.652 GB/s ( 0.01 %)    1.726 ins/byte 
+                                    dfa2                                   8.003 ins/byte,    0.244 branch miss/kbyte,      3.415 GHz,    1.347 GB/s ( 0.02 %)    3.157 ins/byte 
+                                    dfa3                                   7.003 ins/byte,    0.244 branch miss/kbyte,      3.420 GHz,    1.691 GB/s ( 0.01 %)    3.463 ins/byte 
+                                    dfa4                                  10.006 ins/byte,    0.366 branch miss/kbyte,      3.403 GHz,    0.566 GB/s ( 0.02 %)    1.665 ins/byte 
+                              zwegneravx                                   1.259 ins/byte,    0.244 branch miss/kbyte,      3.538 GHz,    9.347 GB/s ( 0.02 %)    3.323 ins/byte 
+                              lookup2avx                                   1.149 ins/byte,    0.244 branch miss/kbyte,      3.613 GHz,   11.857 GB/s ( 0.01 %)    3.761 ins/byte 
+                              lookup3avx                                   1.118 ins/byte,    0.244 branch miss/kbyte,      3.594 GHz,   12.395 GB/s ( 0.01 %)    3.844 ins/byte 
+                                basicavx                                   1.745 ins/byte,    0.244 branch miss/kbyte,      3.493 GHz,    6.416 GB/s ( 0.02 %)    3.206 ins/byte 
+                                rangeavx                                   1.462 ins/byte,    0.183 branch miss/kbyte,      3.506 GHz,    7.788 GB/s ( 0.02 %)    3.247 ins/byte 
 - 1, 2, 3, 4 UTF8 bytes
 Overhead ==> nanoseconds : 20.000, instructions 223.000
-                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.182 GHz,   52.865 GB/s ( 0.05 %) 
-                                  fushia                                  12.486 ins/byte,  117.708 branch miss/kbyte,      3.403 GHz,    0.583 GB/s ( 0.04 %) 
-                                 utf8lib                                  22.304 ins/byte,  234.745 branch miss/kbyte,      3.397 GHz,    0.291 GB/s ( 0.01 %) 
-                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.403 GHz,    0.652 GB/s ( 0.02 %) 
-                                    dfa2                                   7.501 ins/byte,    0.244 branch miss/kbyte,      3.411 GHz,    1.298 GB/s ( 0.03 %) 
-                                    dfa3                                   7.004 ins/byte,    0.244 branch miss/kbyte,      3.422 GHz,    1.803 GB/s ( 0.01 %) 
-                                    dfa4                                   9.003 ins/byte,    0.366 branch miss/kbyte,      3.403 GHz,    0.653 GB/s ( 0.02 %) 
-                              zwegneravx                                   1.258 ins/byte,    0.244 branch miss/kbyte,      3.532 GHz,    9.349 GB/s ( 0.01 %) 
-                              lookup2avx                                   1.149 ins/byte,    0.244 branch miss/kbyte,      3.578 GHz,   11.858 GB/s ( 0.02 %) 
-                              lookup3avx                                   1.118 ins/byte,    0.244 branch miss/kbyte,      3.589 GHz,   12.212 GB/s ( 0.01 %) 
-                                basicavx                                   1.745 ins/byte,    0.183 branch miss/kbyte,      3.472 GHz,    6.417 GB/s ( 0.02 %) 
-                                rangeavx                                   1.462 ins/byte,    0.244 branch miss/kbyte,      3.536 GHz,    7.752 GB/s ( 0.03 %) 
+                                  memcpy                                   0.103 ins/byte,    0.244 branch miss/kbyte,      4.094 GHz,   52.861 GB/s ( 0.06 %)    1.416 ins/byte 
+                                  fushia                                  12.486 ins/byte,  110.698 branch miss/kbyte,      3.403 GHz,    0.600 GB/s ( 0.03 %)    2.204 ins/byte 
+                            fushia_ascii                                  14.997 ins/byte,  104.229 branch miss/kbyte,      3.402 GHz,    0.602 GB/s ( 0.06 %)    2.653 ins/byte 
+                                 utf8lib                                  22.303 ins/byte,  238.909 branch miss/kbyte,      3.398 GHz,    0.281 GB/s ( 0.01 %)    1.843 ins/byte 
+                                     dfa                                   9.001 ins/byte,    0.244 branch miss/kbyte,      3.406 GHz,    0.675 GB/s ( 0.04 %)    1.785 ins/byte 
+                                    dfa2                                   8.004 ins/byte,    0.244 branch miss/kbyte,      3.414 GHz,    1.344 GB/s ( 0.02 %)    3.151 ins/byte 
+                                    dfa3                                   7.004 ins/byte,    0.244 branch miss/kbyte,      3.420 GHz,    1.690 GB/s ( 0.01 %)    3.460 ins/byte 
+                                    dfa4                                  10.006 ins/byte,    0.366 branch miss/kbyte,      3.403 GHz,    0.566 GB/s ( 0.00 %)    1.665 ins/byte 
+                              zwegneravx                                   1.258 ins/byte,    0.244 branch miss/kbyte,      3.552 GHz,    9.348 GB/s ( 0.01 %)    3.310 ins/byte 
+                              lookup2avx                                   1.149 ins/byte,    0.244 branch miss/kbyte,      3.599 GHz,   11.857 GB/s ( 0.01 %)    3.775 ins/byte 
+                              lookup3avx                                   1.118 ins/byte,    0.244 branch miss/kbyte,      3.580 GHz,   12.396 GB/s ( 0.01 %)    3.859 ins/byte 
+                                basicavx                                   1.745 ins/byte,    0.244 branch miss/kbyte,      3.505 GHz,    6.439 GB/s ( 0.01 %)    3.206 ins/byte 
+                                rangeavx                                   1.462 ins/byte,    0.183 branch miss/kbyte,      3.502 GHz,    7.788 GB/s ( 0.02 %)    3.250 ins/byte 
