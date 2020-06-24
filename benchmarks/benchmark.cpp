@@ -52,11 +52,12 @@ namespace active_fastvalidate = fastvalidate::arm64;
     double means = all.total.elapsed_ns() / repeat;                            \
     double margin = (means - all.best.elapsed_ns()) / means;                   \
     double gbs = double(volume) / (all.best.elapsed_ns() - overhead_time);     \
+    double inspercycle = all.best.instructions() / all.best.cycles();          \
     if (collector.has_events()) {                                              \
       printf("                               %8.3f ins/byte, %8.3f branch "    \
              "miss/kbyte,   %8.3f GHz, "                                       \
-             "%8.3f GB/s (%5.2f %%) \n",                                       \
-             insperunit, branchmissperunit * 1000, freq, gbs, margin);         \
+             "%8.3f GB/s (%5.2f %%) %8.3f ins/byte \n",                        \
+             insperunit, branchmissperunit * 1000, freq, gbs, margin,inspercycle);         \
     } else {                                                                   \
       printf("                               %8.3f GB/s  (%5.2f %%)\n", gbs,   \
              margin * 100);                                                    \

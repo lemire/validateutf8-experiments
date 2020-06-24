@@ -32,10 +32,9 @@ namespace active_fastvalidate = fastvalidate::arm64;
     double insperunit = all.best.instructions() / double(volume);              \
     double branchmissperunit = all.best.branch_misses() / double(volume);      \
     double gbs = double(volume) / all.best.elapsed_ns();                       \
-    double inspercycle = all.best.instructions() / all.best.cycles();          \
     if (collector.has_events()) {                                              \
       printf("     %8.3f  %8.3f %8.3f %8.3f", insperunit, branchmissperunit * 1000,  \
-             gbs, inspercycle);                                                \
+             gbs);                                                             \
     } else {                                                                   \
       printf("    %8.3f ", gbs);                                               \
     }                                                                          \
