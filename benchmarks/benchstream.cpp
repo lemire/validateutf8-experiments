@@ -168,6 +168,15 @@ public:
 
       RUNDIFF("fushia_ascii", fushia1_ascii, fushia2_ascii);
 
+      auto lookup4avx1 = [&UTF8, &s1]() {
+        return active_fastvalidate::lookup4::validate(UTF8.data(), s1);
+      };
+      auto lookup4avx2 = [&UTF8, &s2]() {
+        return active_fastvalidate::lookup4::validate(UTF8.data(), s2);
+      };
+
+      RUNDIFF("lookup4avx", lookup4avx1, lookup4avx2);
+
       printf("\n");
     }
   }
@@ -188,7 +197,7 @@ int main(int argc, char **argv) {
   } else {
     printf("# columns match size in bytes then (GB/s)");
   }
-  printf("# the validators are memcpy, branchy, dfa, lookup3, branchy/ascii\n");
+  printf("# the validators are memcpy, branchy, dfa, lookup3, branchy/ascii, lookup4\n");
 
   size_t repeat = atoll(argv[1]);
   printf("# number of repetitions %zu \n", repeat);
