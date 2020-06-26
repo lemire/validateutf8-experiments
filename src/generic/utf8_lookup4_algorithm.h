@@ -1,22 +1,18 @@
 
 using namespace simd;
 
-
-
   really_inline simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
-    const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(49, 49, 49, 49, 49, 49, 49, 49, 0, 0, 0, 0, 76, 8, 28, 58);
-    const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(79, 73, 9, 9, 41, 43, 43, 43, 43, 43, 43, 43, 43, 59, 43, 43);
-    const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(78, 78, 78, 78, 78, 78, 78, 78, 71, 101, 113, 113, 78, 78, 78, 78);
-    return byte_1_high & byte_1_low & byte_2_high;
+    const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(102, 102, 102, 102, 102, 102, 102, 102, 128, 128, 128, 128, 37, 1, 21, 89);
+    const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(231, 163, 131, 131, 139, 203, 203, 203, 203, 203, 203, 203, 203, 219, 203, 203);
+    const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(25, 25, 25, 25, 25, 25, 25, 25, 230, 174, 186, 186, 25, 25, 25, 25);
+    return (byte_1_high & byte_1_low & byte_2_high);
   }
-
-  really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> prev1) {
+  really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> sc) {
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
-    // is_2_3_continuation uses one more instruction than lookup2
-    simd8<bool> is_2_3_continuation = (simd8<int8_t>(input).max(simd8<int8_t>(prev1))) < int8_t(-64);
-    // must_be_2_3_continuation has two fewer instructions than lookup 2
-    return simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation);
+    simd8<uint8_t> must23 = simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3));
+    simd8<uint8_t> must23_80 = must23 & uint8_t(0x80);
+    return must23_80 ^ sc;
   }
 
   //
@@ -51,8 +47,8 @@ using namespace simd;
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
-      this->error |= check_special_cases(input, prev1);
-      this->error |= check_multibyte_lengths(input, prev_input, prev1);
+      simd8<uint8_t> sc = check_special_cases(input, prev1);
+      this->error |= check_multibyte_lengths(input, prev_input, sc);
     }
 
     // The only problem that can happen at EOF is that a multibyte character is too short.

@@ -165,6 +165,10 @@ void twobytetest() {
         printf("twobytetest bug\n");
         abort();
   }  
+  if(active_fastvalidate::lookup4::validate(twobyte, 3) != fastvalidate::error_code::UTF8_ERROR) {
+        printf("twobytetest bug\n");
+        abort();
+  }  
 }
 
 void test() {
@@ -213,6 +217,10 @@ void test() {
         printf("bug goodsequences[%zu]\n", i);
         abort();
     }
+    if(active_fastvalidate::lookup4::validate(goodsequences[i], len) != fastvalidate::error_code::SUCCESS) {
+        printf("bug goodsequences[%zu]\n", i);
+        abort();
+    }
   }
   for (size_t i = 0; i < 26; i++) {
     size_t len = strlen(badsequences[i]);
@@ -224,7 +232,10 @@ void test() {
         printf("bug lookup3 badsequences[%zu]\n", i);
         abort();
     }
-
+    if(active_fastvalidate::lookup4::validate(badsequences[i], len) != fastvalidate::error_code::UTF8_ERROR) {
+        printf("bug lookup4 badsequences[%zu]\n", i);
+        abort();
+    }
   }
   printf("tests ok.\n");
 }
