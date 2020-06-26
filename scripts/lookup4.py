@@ -48,8 +48,6 @@ for j in range(16):
           table.add((z,j, i))
 
 
-
-
 def testme_gah(testme):
   for i in range(len(testme)-1):
     byte1 = testme[i]
@@ -120,6 +118,12 @@ def buildmap(sol) :
         for i in t[2]:
             z[i] |= bit
         bit *= 2
+    if(bit < 256): ## doing the continuation
+        for i in cont:
+            x[i] |= bit
+            z[i] |= bit
+        for i in range(16):
+            y[i] |= bit
     print(x)
     print(y)
     print(z)
