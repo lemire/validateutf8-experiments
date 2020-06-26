@@ -46,6 +46,11 @@ void brute_force_tests() {
         display(UTF8);
         abort();
     }
+    if(active_fastvalidate::lookup4::validate(UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
+        printf("bug brute_force_tests %.*s\n", (int) UTF8.size(), UTF8.data());
+        display(UTF8);
+        abort();
+    }
     if(shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), UTF8.size()) != fastvalidate::error_code::SUCCESS) {
         printf("bug brute_force_tests dfa %.*s\n", (int) UTF8.size(), UTF8.data());
         display(UTF8);
@@ -82,6 +87,18 @@ void brute_force_tests() {
         display(UTF8);
         abort();
       }
+      auto e4 = active_fastvalidate::lookup4::validate(UTF8.data(), UTF8.size());
+      if(e3 != e4) {
+        printf("bug brute_force_tests lookup4 %.*s\n", (int) UTF8.size(), UTF8.data());
+        if(e4 == fastvalidate::error_code::SUCCESS) {
+          printf("lookup4 says it is ok!\n");
+        } else {
+          printf("lookup4 says it is not ok!\n");
+        }
+        display(UTF8);
+        abort();
+      }      
+      
       auto es = shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), UTF8.size());
       
       if(es != e) {
