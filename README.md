@@ -3,7 +3,19 @@
 This project contains benchmarks regarding fast UTF-8 validation. 
 
 
+## Want a production-ready function?
 
+The validateutf8-experiments repository is for research purposes only.
+
+If you want access to a fast validation function for production use, you can rely on the simdjson library. [It is as simple as the following](https://github.com/simdjson/simdjson/blob/master/doc/basics.md#utf-8-validation-alone):
+
+```C++
+  const char * some_string = "[ 1, 2, 3, 4] ";
+  size_t length = strlen(some_string);
+  bool is_ok = simdjson::validate_utf8(some_string, length);
+```
+
+See https://github.com/simdjson/
 
 ## Requirements
 
