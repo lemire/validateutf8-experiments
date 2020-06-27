@@ -56,7 +56,7 @@ namespace active_fastvalidate = fastvalidate::arm64;
     if (collector.has_events()) {                                              \
       printf("                               %8.3f ins/byte, %8.3f branch "    \
              "miss/kbyte,   %8.3f GHz, "                                       \
-             "%8.3f GB/s (%5.2f %%) %8.3f ins/byte \n",                        \
+             "%8.3f GB/s (%5.2f %%) %8.3f ins/cycle \n",                        \
              insperunit, branchmissperunit * 1000, freq, gbs, margin,inspercycle);         \
     } else {                                                                   \
       printf("                               %8.3f GB/s  (%5.2f %%)\n", gbs,   \
