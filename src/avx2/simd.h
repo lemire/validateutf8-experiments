@@ -238,6 +238,7 @@ namespace simd {
     really_inline simd8<bool> bits_not_set(simd8<uint8_t> bits) const { return (*this & bits).bits_not_set(); }
     really_inline simd8<bool> any_bits_set() const { return ~this->bits_not_set(); }
     really_inline simd8<bool> any_bits_set(simd8<uint8_t> bits) const { return ~this->bits_not_set(bits); }
+    really_inline bool is_ascii() const { return _mm256_movemask_epi8(*this) == 0; }
     really_inline bool bits_not_set_anywhere() const { return _mm256_testz_si256(*this, *this); }
     really_inline bool any_bits_set_anywhere() const { return !bits_not_set_anywhere(); }
     really_inline bool bits_not_set_anywhere(simd8<uint8_t> bits) const { return _mm256_testz_si256(*this, bits); }
@@ -307,6 +308,10 @@ namespace simd {
     template <typename F>
     really_inline simd8<T> reduce(F const& reduce_pair) const {
       return reduce_pair(this->chunks[0], this->chunks[1]);
+    }
+    
+    really_inline simd8<T> reduce_or() const {
+      return this->chunks[0] | this->chunks[1];
     }
 
     really_inline uint64_t to_bitmask() const {

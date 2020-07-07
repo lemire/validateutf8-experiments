@@ -320,6 +320,10 @@ namespace simd {
       );
     }
 
+    really_inline simd8<T> reduce_or() const {
+      return (this->chunks[0] | this->chunks[1]) |  (this->chunks[2] | this->chunks[3]);
+    }
+
     really_inline uint64_t to_bitmask() const {
       const uint8x16_t bit_mask = {
         0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,

@@ -25,8 +25,8 @@ really_inline simd8<bool> must_be_continuation(simd8<uint8_t> prev1, simd8<uint8
 namespace lookup3 {
 using namespace simd;
 really_inline bool is_ascii(simd8x64<uint8_t> input) {
-  simd8<uint8_t> bits = input.reduce([&](simd8<uint8_t> a,simd8<uint8_t> b) { return a|b; });
-  return !bits.any_bits_set_anywhere(0b10000000u);
+  simd8<uint8_t> bits = input.reduce_or();
+  return bits.is_ascii();
 }
 
 really_inline simd8<bool> must_be_continuation(simd8<uint8_t> prev1, simd8<uint8_t> prev2, simd8<uint8_t> prev3) {
