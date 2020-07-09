@@ -18,7 +18,7 @@ really_inline simd8<bool> must_be_continuation(simd8<uint8_t> prev1, simd8<uint8
   simd8<uint8_t> is_third_byte  = prev2.saturating_sub(0b11100000u-1); // Only 111_____ will be > 0
   simd8<uint8_t> is_fourth_byte = prev3.saturating_sub(0b11110000u-1); // Only 1111____ will be > 0
   // Caller requires a bool (all 1's). All values resulting from the subtraction will be <= 64, so signed comparison is fine.
-  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > int8_t(0);
+  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > simd8<int8_t>::zero();
 }
 #include "generic/utf8_lookup2_algorithm.h"
 }
@@ -35,7 +35,7 @@ really_inline simd8<bool> must_be_continuation(simd8<uint8_t> prev1, simd8<uint8
   simd8<uint8_t> is_third_byte  = prev2.saturating_sub(0b11100000u-1); // Only 111_____ will be > 0
   simd8<uint8_t> is_fourth_byte = prev3.saturating_sub(0b11110000u-1); // Only 1111____ will be > 0
   // Caller requires a bool (all 1's). All values resulting from the subtraction will be <= 64, so signed comparison is fine.
-  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > int8_t(0);
+  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > simd8<int8_t>::zero();
 }
 
 
@@ -43,7 +43,7 @@ really_inline simd8<bool> must_be_2_3_continuation(simd8<uint8_t> prev2, simd8<u
   simd8<uint8_t> is_third_byte  = prev2.saturating_sub(0b11100000u-1); // Only 111_____ will be > 0
   simd8<uint8_t> is_fourth_byte = prev3.saturating_sub(0b11110000u-1); // Only 1111____ will be > 0
   // Caller requires a bool (all 1's). All values resulting from the subtraction will be <= 64, so signed comparison is fine.
-  return simd8<int8_t>(is_third_byte | is_fourth_byte) > int8_t(0);
+  return simd8<int8_t>(is_third_byte | is_fourth_byte) > simd8<int8_t>::zero();
 }
 
 #include "generic/utf8_lookup3_algorithm.h"
@@ -62,7 +62,7 @@ really_inline simd8<bool> must_be_continuation(simd8<uint8_t> prev1, simd8<uint8
   simd8<uint8_t> is_third_byte  = prev2.saturating_sub(0b11100000u-1); // Only 111_____ will be > 0
   simd8<uint8_t> is_fourth_byte = prev3.saturating_sub(0b11110000u-1); // Only 1111____ will be > 0
   // Caller requires a bool (all 1's). All values resulting from the subtraction will be <= 64, so signed comparison is fine.
-  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > int8_t(0);
+  return simd8<int8_t>(is_second_byte | is_third_byte | is_fourth_byte) > simd8<int8_t>::zero();
 }
 
 
@@ -70,7 +70,7 @@ really_inline simd8<bool> must_be_2_3_continuation(simd8<uint8_t> prev2, simd8<u
   simd8<uint8_t> is_third_byte  = prev2.saturating_sub(0b11100000u-1); // Only 111_____ will be > 0
   simd8<uint8_t> is_fourth_byte = prev3.saturating_sub(0b11110000u-1); // Only 1111____ will be > 0
   // Caller requires a bool (all 1's). All values resulting from the subtraction will be <= 64, so signed comparison is fine.
-  return simd8<int8_t>(is_third_byte | is_fourth_byte) > int8_t(0);
+  return simd8<int8_t>(is_third_byte | is_fourth_byte) > simd8<int8_t>::zero();
 }
 
 #include "generic/utf8_lookup4_algorithm.h"
