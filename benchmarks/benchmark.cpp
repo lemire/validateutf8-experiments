@@ -186,6 +186,9 @@ public:
     auto lookup4avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup4::validate(UTF8.data(), s);
     };
+    auto lookup5avx = [&UTF8, &s]() {
+      return active_fastvalidate::lookup5::validate(UTF8.data(), s);
+    };
     auto basicavx = [&UTF8, &s]() {
       return active_fastvalidate::basic::validate(UTF8.data(), s);
     };
@@ -195,6 +198,7 @@ public:
     RUN("lookup2avx", lookup2avx);
     RUN("lookup3avx", lookup3avx);
     RUN("lookup4avx", lookup4avx);
+    RUN("lookup5avx", lookup5avx);
 
     RUN("basicavx", basicavx);
     RUN("rangeavx", rangeavx);
@@ -311,6 +315,9 @@ public:
     auto lookup4avx = [&UTF8, &s]() {
       return active_fastvalidate::lookup4::validate(UTF8.data(), s);
     };
+    auto lookup5avx = [&UTF8, &s]() {
+      return active_fastvalidate::lookup5::validate(UTF8.data(), s);
+    };
     auto basicavx = [&UTF8, &s]() {
       return active_fastvalidate::basic::validate(UTF8.data(), s);
     };
@@ -320,6 +327,7 @@ public:
     RUN("lookup2avx", lookup2avx);
     RUN("lookup3avx", lookup3avx);
     RUN("lookup4avx", lookup4avx);
+    RUN("lookup5avx", lookup5avx);
 
     RUN("basicavx", basicavx);
     RUN("rangeavx", rangeavx);
