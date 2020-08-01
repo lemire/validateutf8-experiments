@@ -154,10 +154,19 @@ public:
       return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
     RUN("dfa", dfa);
+    auto fdfa = [&UTF8, &s]() {
+      return fast_validate_dfa_utf8((const signed char *)UTF8.data(), s);
+    };
+    RUN("fdfa", fdfa);
+    auto bdfa = [&UTF8, &s]() {
+      return big_validate_dfa_utf8((const signed char *)UTF8.data(), s);
+    };
+    RUN("bdfa", bdfa);
     auto dfa2 = [&UTF8, &s]() {
       return shiftless_validate_dfa_utf8_double(
           (const signed char *)UTF8.data(), s);
     };
+
     RUN("dfa2", dfa2);
 
     auto dfa3 = [&UTF8, &s]() {
@@ -279,6 +288,14 @@ public:
       return shiftless_validate_dfa_utf8((const signed char *)UTF8.data(), s);
     };
     RUN("dfa", dfa);
+    auto fdfa = [&UTF8, &s]() {
+      return fast_validate_dfa_utf8((const signed char *)UTF8.data(), s);
+    };
+    RUN("fdfa", fdfa);
+    auto bdfa = [&UTF8, &s]() {
+      return big_validate_dfa_utf8((const signed char *)UTF8.data(), s);
+    };
+    RUN("bdfa", bdfa);
     auto dfa2 = [&UTF8, &s]() {
       return shiftless_validate_dfa_utf8_double(
           (const signed char *)UTF8.data(), s);
