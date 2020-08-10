@@ -26,7 +26,7 @@ SSHPARAM=""
 
 docker image inspect $container_name >/dev/null 2>&1 || ( echo "instantiating the container" ; docker build --no-cache -t $container_name -f $SCRIPTPATH/Dockerfile --build-arg USER_NAME="$USER"  --build-arg USER_ID=$(id -u)  --build-arg GROUP_ID=$(id -g) .  )
 
-docker run --rm -it -h $container_name $SSHPARAM -v $(pwd):$(pwd):Z  -w $(pwd)  $container_name sh -c "$COMMAND"
+docker run --rm -it -h $container_name --privileged $SSHPARAM -v $(pwd):$(pwd):Z  -w $(pwd)  $container_name sh -c "$COMMAND"
 
 
 
