@@ -2,16 +2,36 @@
 
 This project contains benchmarks regarding fast UTF-8 validation. It is for research purposes only: not for production use. If you are not doing research, this repository is not for you!
 
+## Software requirements
+
+An x64 system with Linux, docker, bash and git.
+
+(It is possible to run these experiments using macOS or Windows as the host, but there might unnecessary be virtualization overhead that might affect the results slightly.)
+
+## Hardware requirements
+
+
+Though the code is generic, the benchmarks assume that you have a processor with AVX2 support (there is no runtime check). Thus please ensure that you have a recent Intel or AMD processor with AVX2 support. We recommend AMD Zen 2 or better, or Intel Skylake and better.
+
+Under Linux, you might be able to know about your CPU with the following command:
+
+```
+lscpu | grep Model
+```
+
+- We recommend that you have bare-metal access to the hardware. Cloud nodes are often noisier.
+- We recommend against testing on a laptop.
+- It is best if you can set the governor (or the equivalent) to `Performance`.
+- Some people prefer to disable hyper-threading and to lock the process on a given processor: if you are using a quiet machine, we believe that it is unnecessary with this benchmark.
+
+
 ## Reproducible experiments
 
 To ensure that experiments are reproducible, we rely on a docker image. We recommend that you install docker under Linux. 
 
-Requirements: An x64 system with Linux, docker, bash and git.
-
-(It is possible to run these experiments using macOS or Windows as the host, but there might unnecessary be virtualization overhead that might affect the results slightly.)
 
 
-Though the code is generic, the benchmarks assume that you have a processor with AVX2 support (there is no runtime check). Thus please ensure that you have a recent Intel or AMD processor with AVX2 support. We recommend AMD Zen 2 or better, or Intel Skylake and better.
+
 
 Starting in a bash shell do:
 
