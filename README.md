@@ -2,6 +2,29 @@
 
 This project contains benchmarks regarding fast UTF-8 validation. 
 
+## Reproducible experiments
+
+To ensure that experiments are reproducible, we rely on a docker image. We recommend that you install docker under Linux. 
+
+Requirements: An x64 system with Linux, bash and git.
+
+(It is possible to run these experiments using macOS or Windows as the host, but there might unnecessary be virtualization overhead that might affect the results slightly.)
+
+
+Though the code is generic, the benchmarks assume that you have a processor with AVX2 support (there is no runtime check). Thus please ensure that you have a recent Intel or AMD processor with AVX2 support. We recommend AMD Zen 2 or better, or Intel Skylake and better.
+
+Starting in a bash shell do:
+
+```
+git clone https://github.com/lemire/validateutf8-experiments.git
+cd validateutf8-experiments
+./run bash
+make
+./unit
+./benchmark
+./benchstream 1000
+```
+
 
 ## Want a production-ready function?
 
@@ -20,12 +43,7 @@ See https://github.com/simdjson/
 
 The simdjson library supports a wide-range of platforms and offers runtime dispatching as well as the most up-to-date algorithms. It is not necessary that your data is made of JSON though this was the original motivation.
 
-## Requirements
-
-- Linux/macOS with make and a recent C++ compiler.
-- A PC with a recent x64 processor (e.g., Intel Skylake or better, AMD Zen 2 or better) or a 64-bit ARM processor.
-
-## Usage
+## Example
 
 ```
 $ git clone https://github.com/lemire/validateutf8-experiments.git
@@ -80,4 +98,4 @@ Input size: (UTF8) 16384
 
 ## Credit
 
-A lot of the hard work is due to John Keiser. Some of the code is based on code by Wojciech Muła.
+A lot of the hard work is due to John Keiser. Some of the code is based on code by Wojciech Muła. The first SIMD UTF-8 validator was based on work by K.~Willets. Some of our improvments were motivated by work by Zwegner who produced some of the finest SIMD-based UTF-8 validators.
