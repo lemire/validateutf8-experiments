@@ -1,6 +1,6 @@
 # validateutf8-experiments
 
-This project contains benchmarks regarding fast UTF-8 validation. 
+This project contains benchmarks regarding fast UTF-8 validation. It is for research purposes only: not for production use. If you are not doing research, this repository is not for you!
 
 ## Reproducible experiments
 
