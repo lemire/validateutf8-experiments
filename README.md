@@ -6,7 +6,7 @@ This project contains benchmarks regarding fast UTF-8 validation. It is for rese
 
 An x64 system with Linux, docker, bash and git.
 
-(It is possible to run these experiments using macOS or Windows as the host, but there might unnecessary be virtualization overhead that might affect the results slightly.)
+Because we use performance counters, you need to have privileged access to the docker containers.
 
 ## Hardware requirements
 
