@@ -118,4 +118,4 @@ Input size: (UTF8) 16384
 
 ## Credit
 
-A lot of the hard work is due to John Keiser. Some of the code is based on code by Wojciech Muła. The first SIMD UTF-8 validator was based on work by K.~Willets. Some of our improvments were motivated by work by Zwegner who produced some of the finest SIMD-based UTF-8 validators.
+A lot of the hard work is due to Keiser. Some of the code is based on code by Muła. The first SIMD UTF-8 validator was based on work by Willets. Some of our improvments were motivated by work by Zwegner who produced some of the finest SIMD-based UTF-8 validators.
