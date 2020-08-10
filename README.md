@@ -6,7 +6,7 @@ This project contains benchmarks regarding fast UTF-8 validation. It is for rese
 
 To ensure that experiments are reproducible, we rely on a docker image. We recommend that you install docker under Linux. 
 
-Requirements: An x64 system with Linux, bash and git.
+Requirements: An x64 system with Linux, docker, bash and git.
 
 (It is possible to run these experiments using macOS or Windows as the host, but there might unnecessary be virtualization overhead that might affect the results slightly.)
 
