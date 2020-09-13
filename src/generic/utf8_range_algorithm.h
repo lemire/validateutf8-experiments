@@ -173,6 +173,7 @@ struct utf8_checker {
       }
     }
   }
+  really_inline void check_eof() {}
 
   really_inline error_code errors() {
     return this->has_error.any() ? error_code::UTF8_ERROR : error_code::SUCCESS;

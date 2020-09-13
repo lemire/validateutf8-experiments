@@ -349,6 +349,7 @@ struct utf8_checker {
       this->check_next_input(in.chunks[i]);
     }
   }
+  really_inline void check_eof() {}
 
   really_inline error_code errors() {
     return (this->special_case_errors.any_bits_set_anywhere() | this->length_errors) ? error_code::UTF8_ERROR : error_code::SUCCESS;

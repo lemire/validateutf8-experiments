@@ -16,6 +16,7 @@
       c.check_next_input(in);
       reader.advance();
     }
+    c.check_eof();
     return c.errors();
   }
 
