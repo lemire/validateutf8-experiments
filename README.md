@@ -191,7 +191,9 @@ Overhead ==> nanoseconds : 20.000, instructions 0.000
 ```
 
 
+## Reference
 
+- John Keiser, Daniel Lemire, [Validating UTF-8 In Less Than One Instruction Per Byte](https://arxiv.org/abs/2010.03090), Software: Practice & Experience (to appear)
 
 
 ## Credit
