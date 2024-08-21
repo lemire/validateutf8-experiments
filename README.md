@@ -2,6 +2,11 @@
 
 This project contains benchmarks regarding fast UTF-8 validation. It is for research purposes only: not for production use. If you are not doing research, this repository is not for you!
 
+The algorithm of this repository has been included in production-ready libraries:
+
+- [simdutf](https://github.com/simdutf/simdutf) C++ library is part of important systems such as Bun, Node.js, WebKit/Safari, etc.
+- [SimdUnicode](https://github.com/simdutf/SimdUnicode) is a C# port of the validation algorithm, adapted for the .NET runtime.
+
 ## Software requirements
 
 An x64 system with Linux, docker, bash and git.
@@ -193,7 +198,7 @@ Overhead ==> nanoseconds : 20.000, instructions 0.000
 
 ## Reference
 
-- John Keiser, Daniel Lemire, [Validating UTF-8 In Less Than One Instruction Per Byte](https://arxiv.org/abs/2010.03090), Software: Practice & Experience (to appear)
+- John Keiser, Daniel Lemire, [Validating UTF-8 In Less Than One Instruction Per Byte](https://arxiv.org/abs/2010.03090), Software: Practice and Experience 51 (5), 2021
 
 
 ## Credit
