@@ -46,7 +46,10 @@ static void run_one(const char *name, size_t volume, Func fn) {
     printf("%-18s | Bug\n", name);
     return;
   }
-  auto agg = counters::bench([&] { sink = int(fn()); });
+  auto agg = counters::bench_impl<1>([&] { sink = int(fn()); },
+                                     /*min_repeat=*/10,
+                                     /*min_time_ns=*/400'000'000,
+                                     /*max_repeat=*/1'000'000);
   const double best_ns = agg.fastest_elapsed_ns();
   const double mean_ns = agg.elapsed_ns();
   const double gbs = double(volume) / best_ns;
