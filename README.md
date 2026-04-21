@@ -9,6 +9,28 @@ The algorithm of this repository has been included in production-ready libraries
 - [simdutf](https://github.com/simdutf/simdutf) C++ library is part of important systems such as Bun, Node.js, WebKit/Safari, etc.
 - [SimdUnicode](https://github.com/simdutf/SimdUnicode) is a C# port of the validation algorithm, adapted for the .NET runtime.
 
+## Code organization
+
+The repository is organized around three main concerns: SIMD validation algorithms, benchmarking, and testing.
+
+- `src/`: core UTF-8 validation code.
+  - `src/generic/`: generic algorithm definitions (`utf8_lookup2_algorithm.h`, `utf8_lookup3_algorithm.h`, `utf8_lookup4_algorithm.h`, etc.).
+  - `src/avx2/`, `src/sse/`, `src/neon/`: architecture-specific SIMD wrappers and implementations.
+- `benchmarks/`: benchmark drivers and supporting utilities.
+  - `benchmarks/benchmark.cpp`: runs algorithm comparisons on synthetic and real data.
+  - `benchmarks/benchstream.cpp`: streaming-oriented benchmark.
+  - `benchmarks/random_utf8.*`: randomized UTF-8 data generation.
+- `tests/`: unit tests (`tests/unit.cpp`) validating correctness across implementations.
+- `examples/`: sample real-world UTF-8 inputs used by benchmarks.
+- `dependencies/`: third-party code used by benchmarks.
+- `.github/workflows/`: CI configuration for build and test automation.
+
+Typical workflow:
+
+1. Build with CMake.
+2. Run `./build/unit` to validate correctness.
+3. Run `./build/benchmark` and `./build/benchstream` to compare performance.
+
 
 ## Hardware requirements
 

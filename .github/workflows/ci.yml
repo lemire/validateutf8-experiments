@@ -28,14 +28,10 @@ jobs:
 
       - name: Build and run tests
         run: |
-          mkdir -p build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build .
-          ctest --output-on-failure
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+          ctest --test-dir build -C Release --output-on-failure
 
       - name: Print test results
         if: always()
-        run: |
-          cd build
-          ctest --output-on-failure --verbose || true
+        run: ctest --test-dir build -C Release --output-on-failure --verbose || true

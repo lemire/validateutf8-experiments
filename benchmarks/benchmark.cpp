@@ -11,13 +11,18 @@
 #include <streambuf>
 #include <string>
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)
+#ifndef __x86_64__
+#define __x86_64__ 1
+#endif
 #include "avx2/implementations.h"
 #include "sse/implementations.h"
 namespace active_fastvalidate = fastvalidate::haswell;
-#elif defined(__aarch64__)
+static constexpr const char *kKernelName = "x86_64 (AVX2 + SSE)";
+#elif defined(__aarch64__) || defined(_M_ARM64)
 #include "neon/implementations.h"
 namespace active_fastvalidate = fastvalidate::arm64;
+static constexpr const char *kKernelName = "arm64 (NEON)";
 #else
 #error "Unsupported platform"
 #endif
@@ -361,6 +366,7 @@ int main(int argc, char **argv) {
       return EXIT_FAILURE;
     }
   }
+  printf("SIMD kernel: %s\n", kKernelName);
   if (kFilter) {
     printf("filter: only running validators matching \"%s\"\n", kFilter);
   }

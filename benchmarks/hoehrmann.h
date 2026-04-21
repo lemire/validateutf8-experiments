@@ -10,7 +10,11 @@
 #include <cstdint>
 
 #ifndef really_inline
+#if defined(_MSC_VER) && !defined(__clang__)
+#define really_inline __forceinline
+#else
 #define really_inline inline __attribute__((always_inline, unused))
+#endif
 #endif
 
 #define UTF8_ACCEPT 0

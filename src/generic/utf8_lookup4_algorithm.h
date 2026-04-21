@@ -2,6 +2,13 @@
 using namespace simd;
 
 
+  // ----------------------------------------------------------------------------
+  // lookup4 goal:
+  // keep all UTF-8 validation decisions in SIMD-friendly bitmasks so every lane
+  // can be checked with a small fixed sequence of LUTs and logical operations.
+  // ----------------------------------------------------------------------------
+
+
   // This helper computes error bits by looking at byte pairs (prev1, input)
   // with three LUTs. Each lane carries a bitmask of possible UTF-8 violations.
   really_inline simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
@@ -107,6 +114,7 @@ using namespace simd;
     );
 
     // Keep only error bits consistent with all three viewpoints.
+    // If a bit survives this AND, we have enough evidence for that error class.
     return (byte_1_high & byte_1_low & byte_2_high);
   }
 
@@ -123,7 +131,7 @@ using namespace simd;
     simd8<uint8_t> must23_80 = must23 & uint8_t(0x80);
 
     // XOR highlights mismatches between expected continuation status and
-    // special-case validity mask.
+    // special-case validity mask. Any nonzero lane means invalid UTF-8.
     return must23_80 ^ sc;
   }
 
@@ -187,6 +195,7 @@ using namespace simd;
     // Process one 64-byte block split into SIMD chunks.
     really_inline void check_next_input(simd8x64<uint8_t> input) {
       // Fast path: pure ASCII needs no internal UTF-8 table checks.
+      // Boundary state still matters (previous block may have ended mid-sequence).
       if (likely(is_ascii(input))) {
         // If the previous block had incomplete UTF-8 characters at the end, an ASCII block can't
         // possibly finish them.

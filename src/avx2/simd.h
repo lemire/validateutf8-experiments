@@ -3,7 +3,11 @@
 
 #include <iostream>
 #include <iomanip>
+#if defined(_MSC_VER) && !defined(__clang__)
+#include <immintrin.h>
+#else
 #include <x86intrin.h>
+#endif
 
 #include "targets.h"
 
@@ -11,7 +15,7 @@ TARGET_HASWELL
 namespace fastvalidate {
 namespace haswell {
 really_inline long long int count_ones(uint64_t input_num) {
-  return _popcnt64(input_num);
+  return (long long int)_mm_popcnt_u64(input_num);
 }
 
 namespace simd {

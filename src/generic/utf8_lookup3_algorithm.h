@@ -64,6 +64,11 @@
 using namespace simd;
 
 
+  // ----------------------------------------------------------------------------
+  // lookup3 builds on lookup2 by folding additional short-sequence and lonely-
+  // continuation checks into the same LUT bitmask pipeline.
+  // ----------------------------------------------------------------------------
+
   //
   // Find special case UTF-8 errors where the character is technically readable (has the right length)
   // but the *value* is disallowed.
@@ -87,16 +92,21 @@ using namespace simd;
     static const int TOO_LARGE   = 0x10; // 11110100 (1001|101_)____
     static const int TOO_LARGE_2 = 0x20; // 1111(1___|011_|0101) 10______
 
-    // New with lookup3. We want to catch the case where an non-continuation 
-    // follows a leading byte
+    // lookup3 addition #1:
+    // Catch cases where a lead is followed by a non-continuation too early
+    // (i.e., a missing continuation / too-short multibyte sequence).
     static const int TOO_SHORT_2_3_4 = 0x40; //  (110_|1110|1111) ____    (0___|110_|1111) ____
-    // We also want to catch a continuation that is preceded by an ASCII byte
+
+    // lookup3 addition #2:
+    // Catch continuation bytes that are not attached to any active multibyte sequence.
     static const int LONELY_CONTINUATION = 0x80; //  0___ ____    01__ ____
 
-    // After processing the rest of byte 1 (the low bits), we're still not done--we have to check
-    // byte 2 to be sure which things are errors and which aren't.
-    // Since high_bits is byte 5, byte 2 is high_bits.prev<3>
+    // We still combine 3 nibble projections as in lookup2:
+    // prev1 high nibble, prev1 low nibble, and input high nibble.
+    // Matching bits across all three indicate active errors in that lane.
     static const int CARRY = OVERLONG_2 | TOO_LARGE_2;
+
+    // LUT A: current byte high nibble.
     const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(
         // ASCII: ________ [0___]____
         CARRY | TOO_SHORT_2_3_4, CARRY | TOO_SHORT_2_3_4,
@@ -113,6 +123,7 @@ using namespace simd;
         CARRY | TOO_SHORT_2_3_4, CARRY | TOO_SHORT_2_3_4,  // 110_
         CARRY | TOO_SHORT_2_3_4, CARRY | TOO_SHORT_2_3_4
     );
+    // LUT B: previous byte high nibble.
     const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(
       // [0___]____ (ASCII)
       LONELY_CONTINUATION, LONELY_CONTINUATION, LONELY_CONTINUATION, LONELY_CONTINUATION,
@@ -124,6 +135,7 @@ using namespace simd;
       OVERLONG_3 | SURROGATE | TOO_SHORT_2_3_4,              // [1110]____ (3-byte lead)
       OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 | TOO_SHORT_2_3_4 // [1111]____ (4+-byte lead)
     );
+    // LUT C: previous byte low nibble.
     const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(
       // ____[00__] ________
       OVERLONG_2 | OVERLONG_3 | OVERLONG_4 | TOO_SHORT_2_3_4 | LONELY_CONTINUATION, // ____[0000] ________
@@ -146,14 +158,22 @@ using namespace simd;
       TOO_LARGE_2 | TOO_SHORT_2_3_4| LONELY_CONTINUATION,  
       TOO_LARGE_2 | TOO_SHORT_2_3_4 | LONELY_CONTINUATION
     );
+    // Intersection of all LUT outputs = definitive per-lane error mask.
     return byte_1_high & byte_1_low & byte_2_high;
   }
 
   really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> prev1) {
+    // Bring N-2 and N-3 into alignment with byte N.
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
+
+    // lookup3 optimization: derive a 2/3-byte continuation-like mask via max()
+    // with prev1, then compare once against -64.
     // is_2_3_continuation uses one more instruction than lookup2
     simd8<bool> is_2_3_continuation = (simd8<int8_t>(input).max(simd8<int8_t>(prev1))) < int8_t(-64);
+
+    // must_be_2_3_continuation computes where continuation is required.
+    // XOR reports mismatches between requirement and observed continuation class.
     // must_be_2_3_continuation has two fewer instructions than lookup 2
     return simd8<uint8_t>(must_be_2_3_continuation(prev2, prev3) ^ is_2_3_continuation);
   }
@@ -190,7 +210,11 @@ using namespace simd;
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
+
+      // Value-level constraints encoded in LUTs.
       this->error |= check_special_cases(input, prev1);
+
+      // Structure-level continuation constraints.
       this->error |= check_multibyte_lengths(input, prev_input, prev1);
     }
 
@@ -207,10 +231,15 @@ using namespace simd;
         // possibly finish them.
         this->error |= this->prev_incomplete;
       } else {
+        // First chunk must reference saved tail from previous block.
         this->check_utf8_bytes(input.chunks[0], this->prev_input_block);
+
+        // Remaining chunks reference prior chunk in the same block.
         for (int i=1; i<simd8x64<uint8_t>::NUM_CHUNKS; i++) {
           this->check_utf8_bytes(input.chunks[i], input.chunks[i-1]);
         }
+
+        // Save state needed to validate next block boundary.
         this->prev_incomplete = is_incomplete(input.chunks[simd8x64<uint8_t>::NUM_CHUNKS-1]);
         this->prev_input_block = input.chunks[simd8x64<uint8_t>::NUM_CHUNKS-1];
       }

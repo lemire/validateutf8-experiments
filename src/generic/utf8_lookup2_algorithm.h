@@ -64,6 +64,13 @@
 using namespace simd;
 
 
+  // ----------------------------------------------------------------------------
+  // lookup2 strategy in one sentence:
+  // 1) classify (prev byte, current byte) with nibble LUTs for value-level rules,
+  // 2) independently verify continuation-length structure,
+  // 3) OR both error masks into the checker state.
+  // ----------------------------------------------------------------------------
+
   //
   // Find special case UTF-8 errors where the character is technically readable (has the right length)
   // but the *value* is disallowed.
@@ -87,10 +94,13 @@ using namespace simd;
     static const int TOO_LARGE   = 0x10; // 11110100 (1001|101_)____
     static const int TOO_LARGE_2 = 0x20; // 1111(1___|011_|0101) 10______
 
-    // After processing the rest of byte 1 (the low bits), we're still not done--we have to check
-    // byte 2 to be sure which things are errors and which aren't.
-    // Since high_bits is byte 5, byte 2 is high_bits.prev<3>
+    // After byte_1 classification, we still need byte_2 high nibble to disambiguate
+    // boundary cases (E0/ED/F0/F4 families).
+    // We keep a small "carry" subset alive until byte_2 contributes its constraints.
     static const int CARRY = OVERLONG_2 | TOO_LARGE_2;
+
+    // LUT A: high nibble of current byte (byte 2 of the candidate pair).
+    // This identifies continuation subrange (8/9/A/B), ASCII, or a new lead.
     const simd8<uint8_t> byte_2_high = input.shr<4>().lookup_16<uint8_t>(
         // ASCII: ________ [0___]____
         CARRY, CARRY, CARRY, CARRY,
@@ -105,6 +115,8 @@ using namespace simd;
         CARRY, CARRY, CARRY, CARRY
     );
 
+    // LUT B: high nibble of previous byte (byte 1 of the candidate pair).
+    // This identifies coarse lead class and continuation/ASCII context.
     const simd8<uint8_t> byte_1_high = prev1.shr<4>().lookup_16<uint8_t>(
       // [0___]____ (ASCII)
       0, 0, 0, 0,                          
@@ -117,6 +129,8 @@ using namespace simd;
       OVERLONG_4 | TOO_LARGE | TOO_LARGE_2 // [1111]____ (4+-byte lead)
     );
 
+    // LUT C: low nibble of previous byte. This is where boundary bytes like
+    // E0, ED, F0, F4 are separated from their neighboring lead values.
     const simd8<uint8_t> byte_1_low = (prev1 & 0x0F).lookup_16<uint8_t>(
       // ____[00__] ________
       OVERLONG_2 | OVERLONG_3 | OVERLONG_4, // ____[0000] ________
@@ -134,7 +148,7 @@ using namespace simd;
       TOO_LARGE_2 | SURROGATE,                            // ____[1101] ________
       TOO_LARGE_2, TOO_LARGE_2
     );
-
+    // AND keeps only error classes simultaneously matched by all three nibble views.
     return byte_1_high & byte_1_low & byte_2_high;
   }
 
@@ -347,12 +361,16 @@ using namespace simd;
   // check_special_cases()--but we'll talk about that there :)
   //
   really_inline simd8<uint8_t> check_multibyte_lengths(simd8<uint8_t> input, simd8<uint8_t> prev_input, simd8<uint8_t> prev1) {
+    // prev2/prev3 align the lead byte that may require byte N to be continuation.
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
 
-    // Cont is 10000000-101111111 (-65...-128)
+    // Continuation bytes are 10xxxxxx, i.e. signed range [-128, -65].
     simd8<bool> is_continuation = simd8<int8_t>(input) < int8_t(-64);
-    // must_be_continuation is architecture-specific because Intel doesn't have unsigned comparisons
+
+    // must_be_continuation computes where continuation is required by preceding leads.
+    // XOR flags any mismatch: expected continuation but not present, or unexpected continuation.
+    // must_be_continuation is architecture-specific because Intel doesn't have unsigned comparisons.
     return simd8<uint8_t>(must_be_continuation(prev1, prev2, prev3) ^ is_continuation);
   }
 
@@ -388,7 +406,11 @@ using namespace simd;
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
+
+      // Value constraints: overlong/surrogate/out-of-range patterns.
       this->error |= check_special_cases(input, prev1);
+
+      // Structural constraints: continuation placement and length compliance.
       this->error |= check_multibyte_lengths(input, prev_input, prev1);
     }
 
@@ -405,10 +427,15 @@ using namespace simd;
         // possibly finish them.
         this->error |= this->prev_incomplete;
       } else {
+        // First SIMD lane group depends on the saved tail from previous block.
         this->check_utf8_bytes(input.chunks[0], this->prev_input_block);
+
+        // Remaining lane groups use the previous chunk as immediate context.
         for (int i=1; i<simd8x64<uint8_t>::NUM_CHUNKS; i++) {
           this->check_utf8_bytes(input.chunks[i], input.chunks[i-1]);
         }
+
+        // Persist boundary state so the next block can validate cross-block sequences.
         this->prev_incomplete = is_incomplete(input.chunks[simd8x64<uint8_t>::NUM_CHUNKS-1]);
         this->prev_input_block = input.chunks[simd8x64<uint8_t>::NUM_CHUNKS-1];
       }
