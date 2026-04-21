@@ -1,4 +1,5 @@
 # validateutf8-experiments
+[![CI Tests](https://github.com/lemire/validateutf8-experiments/actions/workflows/ci.yml/badge.svg)](https://github.com/lemire/validateutf8-experiments/actions/workflows/ci.yml)
 
 This project contains benchmarks regarding fast UTF-8 validation. It is for research purposes only: not for production use. If you are not doing research, this repository is not for you!
 
