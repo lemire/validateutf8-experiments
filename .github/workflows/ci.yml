@@ -1,0 +1,41 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main, develop ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            cmake_preset: ninja-multi-vcvars
+          
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build and run tests
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build .
+          ctest --output-on-failure
+
+      - name: Print test results
+        if: always()
+        run: |
+          cd build
+          ctest --output-on-failure --verbose || true

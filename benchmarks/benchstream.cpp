@@ -1,4 +1,4 @@
-#include "event_counter.h"
+#include "counters/event_counter.h"
 #include "fushia.h"
 #include "hoehrmann.h"
 #include "random_utf8.h"
@@ -17,6 +17,11 @@ namespace active_fastvalidate = fastvalidate::arm64;
 #else
 #error "Unsupported platform"
 #endif
+
+using counters::event_aggregate;
+using counters::event_collector;
+using counters::event_count;
+
 #define RUNINS(name, procedure)                                                \
   {                                                                            \
     event_aggregate all{};                                                     \
