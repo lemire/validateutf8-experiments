@@ -12,10 +12,10 @@ std::vector<uint8_t> RandomUTF8::generate(size_t output_bytes) {
   while (result.size() < output_bytes) {
     switch (bytes_count(gen)) {
     case 0: // 1 byte
-      candidate = val_7bit(gen);
+      candidate = uint8_t(val_7bit(gen));
       while (candidate == 0) { // though strictly speaking, a stream of nulls is
                                // UTF8, it tends to break some code
-        candidate = val_7bit(gen);
+        candidate = uint8_t(val_7bit(gen));
       }
       result.push_back(candidate);
       break;

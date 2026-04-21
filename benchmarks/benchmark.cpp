@@ -5,6 +5,7 @@
 #include "random_utf8.h"
 #include "utf8.h"
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <streambuf>
@@ -23,6 +24,7 @@ namespace active_fastvalidate = fastvalidate::arm64;
 
 static const bool kHasEvents = counters::has_performance_counters();
 static volatile int sink = 0;
+static const char *kFilter = nullptr;
 
 static void print_section(const char *title) {
   printf("\n== %s ==\n", title);
@@ -42,6 +44,7 @@ static void print_table_header() {
 
 template <typename Func>
 static void run_one(const char *name, size_t volume, Func fn) {
+  if (kFilter && !strstr(name, kFilter)) return;
   if (fn() != fastvalidate::error_code::SUCCESS) {
     printf("%-18s | Bug\n", name);
     return;
@@ -335,7 +338,33 @@ public:
   }
 };
 
-int main() {
+static void print_usage(const char *prog) {
+  fprintf(stderr,
+          "usage: %s [--filter=<substring>]\n"
+          "  --filter=<s>   only run validators whose name contains <s>\n",
+          prog);
+}
+
+int main(int argc, char **argv) {
+  for (int i = 1; i < argc; i++) {
+    const char *a = argv[i];
+    if (strncmp(a, "--filter=", 9) == 0) {
+      kFilter = a + 9;
+    } else if (strcmp(a, "--filter") == 0 && i + 1 < argc) {
+      kFilter = argv[++i];
+    } else if (strcmp(a, "-h") == 0 || strcmp(a, "--help") == 0) {
+      print_usage(argv[0]);
+      return EXIT_SUCCESS;
+    } else {
+      fprintf(stderr, "unknown argument: %s\n", a);
+      print_usage(argv[0]);
+      return EXIT_FAILURE;
+    }
+  }
+  if (kFilter) {
+    printf("filter: only running validators matching \"%s\"\n", kFilter);
+  }
+
   RealDataBenchmark rdb;
   rdb.run();
 

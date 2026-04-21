@@ -17,9 +17,11 @@ private:
 
   std::mt19937 gen;
   std::discrete_distribution<> bytes_count;
-  std::uniform_int_distribution<uint8_t> val_7bit{0x00, 0x7f}; // 0b0xxxxxxx
-  std::uniform_int_distribution<uint8_t> val_6bit{0x00, 0x3f}; // 0b10xxxxxx
-  std::uniform_int_distribution<uint8_t> val_5bit{0x00, 0x1f}; // 0b110xxxxx
-  std::uniform_int_distribution<uint8_t> val_4bit{0x00, 0x0f}; // 0b1110xxxx
-  std::uniform_int_distribution<uint8_t> val_3bit{0x00, 0x07}; // 0b11110xxx
+  // uniform_int_distribution<uint8_t> is UB per the standard (MSVC enforces
+  // this); use uint32_t and let the bitwise-OR callers narrow to uint8_t.
+  std::uniform_int_distribution<uint32_t> val_7bit{0x00, 0x7f}; // 0b0xxxxxxx
+  std::uniform_int_distribution<uint32_t> val_6bit{0x00, 0x3f}; // 0b10xxxxxx
+  std::uniform_int_distribution<uint32_t> val_5bit{0x00, 0x1f}; // 0b110xxxxx
+  std::uniform_int_distribution<uint32_t> val_4bit{0x00, 0x0f}; // 0b1110xxxx
+  std::uniform_int_distribution<uint32_t> val_3bit{0x00, 0x07}; // 0b11110xxx
 };
