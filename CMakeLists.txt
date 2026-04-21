@@ -31,7 +31,8 @@ target_include_directories(unit PRIVATE src benchmarks)
 target_link_libraries(unit PRIVATE random_utf8)
 
 add_executable(benchmark benchmarks/benchmark.cpp)
-target_include_directories(benchmark PRIVATE src benchmarks dependencies/utf8_v2_3_4/source)
+target_include_directories(benchmark PRIVATE src benchmarks)
+target_include_directories(benchmark SYSTEM PRIVATE dependencies/utf8_v2_3_4/source)
 target_link_libraries(benchmark PRIVATE random_utf8 counters::counters)
 
 add_executable(benchstream benchmarks/benchstream.cpp)
